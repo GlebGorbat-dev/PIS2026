@@ -29,3 +29,5 @@ logs/
 *.log
 
 .ipynb_checkpoints/
+
+demos/*.mov
