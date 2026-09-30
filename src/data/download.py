@@ -1,12 +1,3 @@
-"""Шаг 3.1 — получение исходных данных.
-
-Скачивает архив с Zenodo, сверяет md5 с опубликованным в записи датасета
-и распаковывает его в data/raw/extracted. Архив и изображения не попадают
-в git, поэтому этот скрипт — единственный способ воспроизвести набор данных.
-
-Запуск:  python -m src.data.download
-"""
-
 from __future__ import annotations
 
 import argparse
@@ -19,7 +10,7 @@ from pathlib import Path
 
 from src.paths import RAW_DIR, RAW_IMAGES_DIR, ensure_dirs, load_dataset_config
 
-CHUNK = 1 << 20  # 1 МиБ
+CHUNK = 1 << 20
 
 
 def file_md5(path: Path, chunk_size: int = CHUNK) -> str:
@@ -31,7 +22,6 @@ def file_md5(path: Path, chunk_size: int = CHUNK) -> str:
 
 
 def download(url: str, target: Path) -> None:
-    """Качает файл, показывая прогресс в одну строку."""
     print(f"Загрузка: {url}")
     with urllib.request.urlopen(url) as response, target.open("wb") as out:
         total = int(response.headers.get("Content-Length", 0))
@@ -46,7 +36,6 @@ def download(url: str, target: Path) -> None:
 
 
 def extract(archive: Path, destination: Path) -> int:
-    """Распаковывает архив, пропуская служебный мусор macOS/Windows."""
     if destination.exists():
         shutil.rmtree(destination)
     destination.mkdir(parents=True)

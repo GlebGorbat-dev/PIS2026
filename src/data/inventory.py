@@ -1,15 +1,3 @@
-"""Шаг 3.2 — инвентаризация распакованных данных.
-
-Проходит по data/raw/extracted, сопоставляет имена папок с каноническими
-классами из configs/dataset.yaml, открывает каждое изображение и складывает
-всё найденное в data/interim/inventory.csv.
-
-Отдельно отвечает на вопрос «проверены классы»: любая метка, не описанная
-в конфиге, попадает в отчёт как unmapped и требует ручного решения.
-
-Запуск:  python -m src.data.inventory
-"""
-
 from __future__ import annotations
 
 import argparse
@@ -33,7 +21,6 @@ from src.paths import (
     relative_to_root,
 )
 
-# Pillow предупреждает о больших файлах; снимки с телефонов легально большие.
 Image.MAX_IMAGE_PIXELS = None
 
 
@@ -55,7 +42,6 @@ class ImageRecord:
 
 
 def build_alias_map(classes_config: dict) -> dict[str, str]:
-    """Строит отображение «нормализованный псевдоним -> канонический класс»."""
     alias_map: dict[str, str] = {}
     for canonical, meta in classes_config.items():
         aliases = set(meta.get("aliases", [])) | {canonical}
@@ -65,26 +51,16 @@ def build_alias_map(classes_config: dict) -> dict[str, str]:
 
 
 def normalize(text: str) -> str:
-    """Приводит метку к виду, по которому можно искать псевдоним."""
     return re.sub(r"[^a-z0-9]+", "_", text.strip().lower()).strip("_")
 
 
 def filename_prefix(file_name: str) -> str:
-    """Буквенный префикс имени файла: "YellowRust1003.png" -> "YellowRust"."""
     stem = Path(file_name).stem
     match = re.match(r"^([A-Za-z][A-Za-z _-]*)", stem)
     return match.group(1).strip(" _-") if match else ""
 
 
 def resolve_class(path: Path, root: Path, alias_map: dict[str, str]) -> tuple[str, str]:
-    """Определяет класс изображения по его пути внутри распакованного архива.
-
-    В архиве Zenodo метка хранится в префиксе имени файла (BrownRust1018.png),
-    но встречаются и раскладки с папкой на класс, поэтому проверяются оба
-    варианта: сначала каталоги от ближнего к дальнему, затем имя файла.
-
-    Возвращает (канонический класс или "", источник метки).
-    """
     relative_parts = path.relative_to(root).parts[:-1]
     for part in reversed(relative_parts):
         canonical = alias_map.get(normalize(part))
@@ -122,7 +98,7 @@ def scan(root: Path, config: dict) -> tuple[list[ImageRecord], Counter]:
         file_bytes = path.stat().st_size
         try:
             with Image.open(path) as image:
-                image.load()  # ловит обрезанные JPEG, а не только битый заголовок
+                image.load()
                 width, height = image.size
                 mode = image.mode
                 image_format = image.format or ""

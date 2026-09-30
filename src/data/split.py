@@ -1,17 +1,3 @@
-"""Шаг 3.4 — разбиение на train / val / test.
-
-Разбиение стратифицированное по классу и групповое по сцене: все кадры одной
-сцены попадают в одну выборку целиком. Обычный train_test_split этого не умеет,
-поэтому внутри каждого класса группы раскладываются жадно — очередная группа
-уходит в ту выборку, которой сильнее всего не хватает изображений.
-
-Результат детерминирован: random_seed из configs/dataset.yaml фиксирует порядок
-перебора групп. Тестовая выборка после этого не меняется — она нужна одна и та
-же для этапов 5, 9 и 10, иначе метрики моделей нельзя сравнивать.
-
-Запуск:  python -m src.data.split
-"""
-
 from __future__ import annotations
 
 import argparse
@@ -38,7 +24,6 @@ def assign_groups(
     ratios: dict[str, float],
     order: list[int],
 ) -> dict[int, str]:
-    """Раскладывает группы по выборкам, минимизируя перекос от целевых долей."""
     total = sum(group_sizes.values())
     targets = {name: ratios[name] * total for name in SPLIT_NAMES}
     current = {name: 0 for name in SPLIT_NAMES}
@@ -46,8 +31,6 @@ def assign_groups(
 
     for group_id in order:
         size = group_sizes[group_id]
-        # Выбираем выборку с наибольшим дефицитом; при равенстве — по порядку
-        # train, val, test, чтобы результат не зависел от порядка словаря.
         chosen = max(
             SPLIT_NAMES,
             key=lambda name: (targets[name] - current[name], -SPLIT_NAMES.index(name)),
@@ -70,13 +53,11 @@ def split_frame(clean: pd.DataFrame, config: dict) -> pd.DataFrame:
 
     result = clean.copy()
     if not use_groups:
-        # Каждое изображение — своя группа: чистая стратификация без группировки.
         result["scene_group"] = range(len(result))
 
     result["split"] = ""
     for class_name, class_frame in result.groupby("class_name"):
         group_sizes = class_frame["scene_group"].value_counts().to_dict()
-        # Крупные группы распределяем первыми — так итоговые доли точнее.
         order = (
             pd.Series(group_sizes)
             .sample(frac=1.0, random_state=seed)
@@ -114,7 +95,6 @@ def main(argv: list[str] | None = None) -> int:
     counts = pd.crosstab(result["class_name"], result["split"])
     counts = counts.reindex(columns=list(SPLIT_NAMES), fill_value=0).sort_index()
 
-    # Проверка, что ни одна сцена не разъехалась по выборкам.
     leaks = (
         result.groupby("scene_group")["split"].nunique().loc[lambda s: s > 1].index.tolist()
     )
@@ -143,9 +123,10 @@ def main(argv: list[str] | None = None) -> int:
         },
         "scene_groups_leaked_across_splits": leaks,
         "classes_missing_in_split": {
-            name: sorted(set(result["class_name"].unique()) - set(
-                result.loc[result["split"] == name, "class_name"].unique()
-            ))
+            name: sorted(
+                set(result["class_name"].unique())
+                - set(result.loc[result["split"] == name, "class_name"].unique())
+            )
             for name in SPLIT_NAMES
         },
     }

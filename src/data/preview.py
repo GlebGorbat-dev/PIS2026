@@ -1,18 +1,3 @@
-"""Шаг 3.5 — способ визуальной проверки набора.
-
-Собирает два артефакта:
-
-* contact-sheet на каждый класс — сетка миниатюр в одном PNG. Позволяет за
-  один взгляд заметить чужое изображение в классе, пересвет, кадры без листа;
-* reports/stage3/dataset_review.html — страница со всеми сетками, счётчиками
-  и списком удалённых дубликатов.
-
-Выборка миниатюр детерминирована (тот же seed, что у разбиения), поэтому
-повторный запуск даёт тот же контактный лист и его можно сравнивать с прошлым.
-
-Запуск:  python -m src.data.preview
-"""
-
 from __future__ import annotations
 
 import argparse
@@ -43,7 +28,6 @@ BACKGROUND = (250, 250, 250)
 
 
 def make_thumbnail(path: Path, size: int) -> Image.Image:
-    """Миниатюра фиксированного размера с обрезкой по центру."""
     with Image.open(path) as image:
         image = image.convert("RGB")
         width, height = image.size
@@ -59,7 +43,6 @@ def contact_sheet(
     thumb_px: int,
     cols: int,
 ) -> Image.Image:
-    """Сетка миниатюр; под каждой — выборка, в которую попало изображение."""
     cell = thumb_px + LABEL_STRIP_PX
     rows = (len(frame) + cols - 1) // cols
     sheet = Image.new("RGB", (cols * cell, max(rows, 1) * cell), BACKGROUND)
@@ -74,7 +57,11 @@ def contact_sheet(
             draw.rectangle([x, y, x + thumb_px, y + thumb_px], fill=(220, 120, 120))
             draw.text((x + 4, y + 4), "ошибка чтения", fill=(255, 255, 255))
         caption = getattr(row, "split", "") or ""
-        draw.text((x + 3, y + thumb_px + 3), f"{caption} {Path(row.path).name[:18]}", fill=(60, 60, 60))
+        draw.text(
+            (x + 3, y + thumb_px + 3),
+            f"{caption} {Path(row.path).name[:18]}",
+            fill=(60, 60, 60),
+        )
 
     print(f"  {title}: {len(frame)} миниатюр, сетка {cols}x{rows}")
     return sheet
@@ -186,7 +173,6 @@ def main(argv: list[str] | None = None) -> int:
     sheets: dict[str, str] = {}
     per_class: dict[str, dict] = {}
     for class_name, class_frame in frame.groupby("class_name"):
-        # Берём примеры из всех трёх выборок, чтобы глазами оценить и train, и test.
         per_split = max(1, samples // len(SPLIT_NAMES))
         chunks = []
         for split_name in SPLIT_NAMES:
@@ -195,8 +181,6 @@ def main(argv: list[str] | None = None) -> int:
                 chunks.append(subset.sample(n=min(len(subset), per_split), random_state=seed))
         sample = pd.concat(chunks).sort_values(["split", "path"])
         sheet = contact_sheet(sample, class_name, thumb_px, cols)
-        # JPEG, а не PNG: контактный лист — это фотографии, и в PNG он весит
-        # около 1,7 МБ на класс, что лишнее в репозитории.
         sheet_path = PREVIEWS_DIR / f"{class_name}.jpg"
         sheet.save(sheet_path, quality=88, optimize=True)
         sheets[class_name] = sheet_path.relative_to(STAGE3_REPORTS_DIR).as_posix()

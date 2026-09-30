@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Детектирование заболеваний зерновых растений</title>
+  <link rel="stylesheet" href="{{ url_for('static', path='styles.css') }}">
+</head>
+<body>
+<main>
+  <header>
+    <h1>Детектирование заболеваний зерновых растений</h1>
+    <p class="lead">
+      Загрузите фотографию листа или растения пшеницы. Программа определит
+      состояние растения: здоровое или одно из четырёх заболеваний.
+    </p>
+  </header>
+
+  {% if error %}
+    <p class="message error" role="alert">{{ error }}</p>
+  {% endif %}
+  {% if notice %}
+    <p class="message notice" role="status">{{ notice }}</p>
+  {% endif %}
+
+  {% if image %}
+    <section class="preview">
+      <h2>Выбранное изображение</h2>
+      <img src="/image?v={{ image.token }}" alt="Загруженная фотография растения">
+      <dl class="facts">
+        <dt>Файл</dt><dd>{{ image.original_name }}</dd>
+        <dt>Формат</dt><dd>{{ image.image_format }}</dd>
+        <dt>Размер кадра</dt><dd>{{ image.width }} × {{ image.height }} px ({{ '%.1f'|format(image.megapixels) }} Мп)</dd>
+        <dt>Объём файла</dt><dd>{{ human_size(image.size_bytes) }}</dd>
+      </dl>
+
+      <div class="actions">
+        <form action="/predict" method="post">
+          <button type="submit" class="primary">Определить заболевание</button>
+        </form>
+        <form action="/reset" method="post">
+          <button type="submit" class="ghost">Убрать изображение</button>
+        </form>
+      </div>
+    </section>
+
+    <section class="upload">
+      <h2>Заменить другой фотографией</h2>
+      <form action="/upload" method="post" enctype="multipart/form-data">
+        <input type="file" name="photo" accept="image/*" required>
+        <button type="submit" class="primary">Заменить</button>
+      </form>
+    </section>
+  {% else %}
+    <section class="upload empty">
+      <h2>Выберите изображение</h2>
+      <form action="/upload" method="post" enctype="multipart/form-data">
+        <input type="file" name="photo" accept="image/*" required>
+        <button type="submit" class="primary">Загрузить</button>
+      </form>
+      <p class="hint">
+        Форматы: {{ allowed_formats|join(', ') }}. Размер файла — до {{ max_upload_mb }} МБ.
+      </p>
+    </section>
+  {% endif %}
+
+  <section class="classes">
+    <h2>Распознаваемые состояния</h2>
+    <ul>
+      {% for key, meta in classes.items() %}
+        <li><code>{{ key }}</code> — {{ meta.ru }}</li>
+      {% endfor %}
+    </ul>
+  </section>
+
+  <footer>
+    <p>Этап 2: приём произвольного изображения. Версия {{ version }}.</p>
+  </footer>
+</main>
+</body>
+</html>

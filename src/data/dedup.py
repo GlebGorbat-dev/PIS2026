@@ -1,20 +1,3 @@
-"""Шаг 3.3 — удаление явных дубликатов.
-
-Работает в три приёма:
-
-1. Точные дубликаты — совпадение md5. Остаётся одна копия.
-2. Явные near-duplicate — расстояние Хэмминга между dHash не больше
-   phash_hamming_threshold. Тоже остаётся одна копия.
-3. Сцены — расстояние не больше scene_group_hamming_threshold. Такие кадры
-   остаются оба, но получают общий scene_group: этап разбиения не разведёт их
-   по разным выборкам, иначе тест окажется завышенным.
-
-Отдельно выделяется конфликт разметки: одинаковое изображение в двух разных
-классах. Это не дубликат, а ошибка данных, и она выносится в отчёт.
-
-Запуск:  python -m src.data.dedup
-"""
-
 from __future__ import annotations
 
 import argparse
@@ -39,8 +22,6 @@ from src.paths import (
 
 
 class UnionFind:
-    """Склейка изображений в группы по попарной похожести."""
-
     def __init__(self, items: list[str]) -> None:
         self._parent = {item: item for item in items}
 
@@ -48,7 +29,7 @@ class UnionFind:
         root = item
         while self._parent[root] != root:
             root = self._parent[root]
-        while self._parent[item] != root:  # сжатие пути
+        while self._parent[item] != root:
             self._parent[item], item = root, self._parent[item]
         return root
 
@@ -65,11 +46,6 @@ class UnionFind:
 
 
 def similar_pairs(frame: pd.DataFrame, threshold: int) -> list[tuple[str, str, int]]:
-    """Все пары изображений с расстоянием dHash не больше порога.
-
-    На тысяче изображений полный перебор — это полмиллиона сравнений битов,
-    то есть доли секунды, поэтому индексы не нужны.
-    """
     hashes = {row.path: hex_to_dhash(row.dhash) for row in frame.itertuples()}
     pairs = []
     for left, right in combinations(hashes, 2):
@@ -102,7 +78,6 @@ def main(argv: list[str] | None = None) -> int:
     removal_records: list[dict] = []
     removed: set[str] = set()
 
-    # --- 1. Точные дубликаты по md5 ---
     exact_groups = 0
     for md5_value, group in usable.groupby("md5"):
         if len(group) < 2:
@@ -124,7 +99,6 @@ def main(argv: list[str] | None = None) -> int:
                 }
             )
 
-    # --- 2. Явные near-duplicate по dHash ---
     remaining = usable[~usable["path"].isin(removed)]
     near_pairs = similar_pairs(remaining, exact_threshold)
     pair_distance = {frozenset(pair): distance for *pair, distance in near_pairs}
@@ -146,8 +120,6 @@ def main(argv: list[str] | None = None) -> int:
                     "path": path,
                     "kind": "near",
                     "kept_instead": keeper,
-                    # -1, если удаляемый кадр похож не на keeper напрямую,
-                    # а на другого участника той же группы.
                     "distance": pair_distance.get(frozenset((path, keeper)), -1),
                     "md5": "",
                     "class_name": class_by_path[path],
@@ -155,20 +127,16 @@ def main(argv: list[str] | None = None) -> int:
                 }
             )
 
-    # --- 3. Конфликты разметки: один и тот же кадр в разных классах ---
     conflicts = [
         record
         for record in removal_records
         if record["class_name"] != record["kept_class"]
     ]
 
-    # --- 4. Группы сцен для честного разбиения ---
     clean = usable[~usable["path"].isin(removed)].copy().reset_index(drop=True)
     scene_pairs = similar_pairs(clean, scene_threshold)
     scene_union = UnionFind(sorted(clean["path"]))
     for left, right, _ in scene_pairs:
-        # Склеиваем только внутри класса: похожие кадры разных болезней —
-        # это сложные примеры, а не одна сцена.
         if class_by_path[left] == class_by_path[right]:
             scene_union.union(left, right)
 
@@ -219,8 +187,10 @@ def main(argv: list[str] | None = None) -> int:
         f"(точных {summary['removed_exact']}, визуальных {summary['removed_near']})"
     )
     print(f"Осталось изображений: {summary['clean_images']}")
-    print(f"Групп сцен: {summary['scene_groups_total']} "
-          f"(из них с >1 изображением: {multi_scene})")
+    print(
+        f"Групп сцен: {summary['scene_groups_total']} "
+        f"(из них с >1 изображением: {multi_scene})"
+    )
     if conflicts:
         print(f"ВНИМАНИЕ: конфликтов разметки — {len(conflicts)}, см. отчёт")
     print(f"\nСписок удалённых: {relative_to_root(DUPLICATES_CSV)}")
