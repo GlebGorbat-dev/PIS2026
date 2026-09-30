@@ -1,0 +1,42 @@
+{
+  "samples_per_class": 24,
+  "per_class": {
+    "brown_rust": {
+      "total": 128,
+      "train": 90,
+      "val": 19,
+      "test": 19
+    },
+    "healthy": {
+      "total": 122,
+      "train": 86,
+      "val": 18,
+      "test": 18
+    },
+    "mildew": {
+      "total": 161,
+      "train": 113,
+      "val": 24,
+      "test": 24
+    },
+    "septoria": {
+      "total": 348,
+      "train": 244,
+      "val": 52,
+      "test": 52
+    },
+    "yellow_rust": {
+      "total": 239,
+      "train": 167,
+      "val": 36,
+      "test": 36
+    }
+  },
+  "sheets": {
+    "brown_rust": "previews/brown_rust.jpg",
+    "healthy": "previews/healthy.jpg",
+    "mildew": "previews/mildew.jpg",
+    "septoria": "previews/septoria.jpg",
+    "yellow_rust": "previews/yellow_rust.jpg"
+  }
+}

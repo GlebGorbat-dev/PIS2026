@@ -1,0 +1,82 @@
+{
+  "root": "data/raw/extracted",
+  "files_indexed": 999,
+  "declared_image_count": 999,
+  "ok": 999,
+  "rejected": 0,
+  "reject_reasons": {},
+  "classes_declared": [
+    "brown_rust",
+    "healthy",
+    "mildew",
+    "septoria",
+    "yellow_rust"
+  ],
+  "classes_found": [
+    "brown_rust",
+    "healthy",
+    "mildew",
+    "septoria",
+    "yellow_rust"
+  ],
+  "classes_missing": [],
+  "unmapped_labels": {},
+  "per_class": {
+    "brown_rust": {
+      "total": 128,
+      "ok": 128,
+      "rejected": 0
+    },
+    "healthy": {
+      "total": 122,
+      "ok": 122,
+      "rejected": 0
+    },
+    "mildew": {
+      "total": 161,
+      "ok": 161,
+      "rejected": 0
+    },
+    "septoria": {
+      "total": 349,
+      "ok": 349,
+      "rejected": 0
+    },
+    "yellow_rust": {
+      "total": 239,
+      "ok": 239,
+      "rejected": 0
+    }
+  },
+  "label_source_to_class": {
+    "BrownRust": [
+      "brown_rust"
+    ],
+    "Healthy": [
+      "healthy"
+    ],
+    "Mildew": [
+      "mildew"
+    ],
+    "Septoria": [
+      "septoria"
+    ],
+    "YellowRust": [
+      "yellow_rust"
+    ]
+  },
+  "resolution": {
+    "width_min": 567,
+    "width_max": 850,
+    "height_min": 319,
+    "height_max": 1261
+  },
+  "modes": {
+    "RGBA": 974,
+    "RGB": 25
+  },
+  "formats": {
+    "PNG": 974,
+    "JPEG": 25
+  }
+}

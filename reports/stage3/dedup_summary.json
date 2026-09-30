@@ -1,0 +1,21 @@
+{
+  "input_ok_images": 999,
+  "removed_total": 1,
+  "removed_exact": 0,
+  "removed_near": 1,
+  "exact_groups": 0,
+  "near_groups": 1,
+  "phash_hamming_threshold": 4,
+  "scene_group_hamming_threshold": 12,
+  "clean_images": 998,
+  "clean_per_class": {
+    "brown_rust": 128,
+    "healthy": 122,
+    "mildew": 161,
+    "septoria": 348,
+    "yellow_rust": 239
+  },
+  "scene_groups_total": 997,
+  "scene_groups_with_multiple_images": 1,
+  "label_conflicts": []
+}

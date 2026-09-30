@@ -1,0 +1,76 @@
+{
+  "clean_images": 998,
+  "target_ratios": {
+    "train": 0.7,
+    "val": 0.15,
+    "test": 0.15
+  },
+  "random_seed": 42,
+  "group_near_duplicates": true,
+  "counts_per_split": {
+    "train": 700,
+    "val": 149,
+    "test": 149
+  },
+  "actual_ratios": {
+    "train": 0.7014,
+    "val": 0.1493,
+    "test": 0.1493
+  },
+  "counts_per_class_split": {
+    "brown_rust": {
+      "train": 90,
+      "val": 19,
+      "test": 19
+    },
+    "healthy": {
+      "train": 86,
+      "val": 18,
+      "test": 18
+    },
+    "mildew": {
+      "train": 113,
+      "val": 24,
+      "test": 24
+    },
+    "septoria": {
+      "train": 244,
+      "val": 52,
+      "test": 52
+    },
+    "yellow_rust": {
+      "train": 167,
+      "val": 36,
+      "test": 36
+    }
+  },
+  "class_share_per_split": {
+    "train": {
+      "brown_rust": 0.1286,
+      "healthy": 0.1229,
+      "mildew": 0.1614,
+      "septoria": 0.3486,
+      "yellow_rust": 0.2386
+    },
+    "val": {
+      "brown_rust": 0.1275,
+      "healthy": 0.1208,
+      "mildew": 0.1611,
+      "septoria": 0.349,
+      "yellow_rust": 0.2416
+    },
+    "test": {
+      "brown_rust": 0.1275,
+      "healthy": 0.1208,
+      "mildew": 0.1611,
+      "septoria": 0.349,
+      "yellow_rust": 0.2416
+    }
+  },
+  "scene_groups_leaked_across_splits": [],
+  "classes_missing_in_split": {
+    "train": [],
+    "val": [],
+    "test": []
+  }
+}

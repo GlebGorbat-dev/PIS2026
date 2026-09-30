@@ -1,0 +1,38 @@
+# --- Python ---
+__pycache__/
+*.py[cod]
+*.egg-info/
+.Python
+build/
+dist/
+
+# --- Virtual environments ---
+.venv/
+venv/
+env/
+
+# --- IDE ---
+.idea/
+.vscode/
+
+# --- OS ---
+.DS_Store
+Thumbs.db
+
+# --- Data ---
+# Исходный архив и распакованные изображения не версионируются:
+# они восстанавливаются скриптом src/data/download.py по DOI из configs/dataset.yaml.
+data/raw/
+data/interim/images/
+data/processed/images/
+
+# --- Модели и логи (этапы 4+) ---
+models/*.pt
+models/*.pth
+models/*.onnx
+runs/
+logs/
+*.log
+
+# --- Jupyter ---
+.ipynb_checkpoints/

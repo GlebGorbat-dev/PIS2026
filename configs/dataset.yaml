@@ -1,0 +1,72 @@
+# Конфигурация датасета для задачи "Детекция заболеваний зерновых растений".
+# Культура: пшеница (Triticum aestivum).
+
+source:
+  name: "Wheat disease images (small dataset)"
+  doi: "10.5281/zenodo.7573133"
+  record_url: "https://zenodo.org/records/7573133"
+  download_url: "https://zenodo.org/records/7573133/files/Long%202023%20Plant%20Path%20999%20photos.zip?download=1"
+  archive_name: "wheat_999.zip"
+  archive_md5: "1f8a7c660c2da137b957fb4edee3dd7d"
+  license: "CC-BY-4.0"
+  citation: >-
+    Long, M. C., Hartley, M., Morris, R. J., & Brown, J. K. M. (2023).
+    Wheat disease images (small dataset) [Data set]. Zenodo.
+    https://doi.org/10.5281/zenodo.7573133
+  declared_image_count: 999
+  notes: >-
+    Публичное подмножество полного набора на 19 172 изображения. Снимки сделаны
+    в реальных условиях роста (поле/теплица), а не в лаборатории.
+
+# Канонические имена классов, которые использует программа.
+# aliases — варианты написания папок внутри архива, приводимые к канону.
+classes:
+  healthy:
+    ru: "Здоровое растение"
+    aliases: ["healthy", "health", "control", "no_disease"]
+  yellow_rust:
+    ru: "Жёлтая ржавчина"
+    aliases: ["yellow_rust", "yellow rust", "yellowrust", "yr", "stripe_rust"]
+  brown_rust:
+    ru: "Бурая ржавчина"
+    aliases: ["brown_rust", "brown rust", "brownrust", "br", "leaf_rust"]
+  septoria:
+    ru: "Септориоз"
+    aliases: ["septoria", "septoria_leaf_blotch", "stb"]
+  mildew:
+    ru: "Мучнистая роса"
+    aliases: ["mildew", "powdery_mildew", "powderymildew", "pm"]
+
+# Правила отбраковки изображений на этапе инвентаризации.
+quality_filters:
+  min_side_px: 64          # изображения с меньшей стороной отбрасываются
+  min_file_bytes: 2048     # защита от «битых» нулевых файлов
+  allowed_extensions: [".jpg", ".jpeg", ".png", ".bmp", ".tif", ".tiff"]
+
+# Поиск дубликатов.
+deduplication:
+  # Точные дубликаты: совпадение md5 содержимого файла.
+  exact: true
+  # Near-duplicate: расстояние Хэмминга между 64-битными dHash <= порога.
+  # Такие изображения считаются явными дубликатами и удаляются.
+  phash_hamming_threshold: 4
+  # Более мягкий порог: похожие, но не одинаковые кадры (тот же лист с другого
+  # ракурса). Они остаются в наборе, но склеиваются в одну группу, чтобы не
+  # разъезжаться между train и test.
+  scene_group_hamming_threshold: 12
+
+# Разбиение на выборки. Стратификация по классу, суммы дают 1.0.
+split:
+  train: 0.70
+  val: 0.15
+  test: 0.15
+  random_seed: 42
+  # Изображения, попавшие в одну группу near-duplicate, не разъезжаются
+  # по разным выборкам — иначе тестовая метрика будет завышена.
+  group_near_duplicates: true
+
+# Визуальная проверка набора.
+preview:
+  samples_per_class: 24
+  thumbnail_px: 180
+  grid_cols: 6
