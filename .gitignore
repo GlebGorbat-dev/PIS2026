@@ -24,6 +24,7 @@ data/uploads/
 models/*.pt
 models/*.pth
 models/*.onnx
+!models/stage4.pt
 runs/
 logs/
 *.log
