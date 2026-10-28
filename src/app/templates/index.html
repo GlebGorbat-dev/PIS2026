@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Детектирование заболеваний зерновых растений</title>
   <link rel="stylesheet" href="{{ url_for('static', path='styles.css') }}">
+  <script src="{{ url_for('static', path='app.js') }}" defer></script>
 </head>
 <body>
 <main>
@@ -52,8 +53,26 @@
             </li>
           {% endfor %}
         </ul>
+
+        <div class="symptoms">
+          <h3>{% if result.low_confidence %}Сравните с фотографией{% else %}Как это выглядит{% endif %}</h3>
+          {% for item in result.compare %}
+            <p><strong>{{ item.class_ru }}.</strong> {{ item.symptoms }}</p>
+          {% endfor %}
+        </div>
+
+        <p class="advice">
+          {% if result.is_healthy %}
+            Признаков болезни модель не нашла. Продолжайте регулярно осматривать посевы,
+            особенно нижние листья и в сырую погоду.
+          {% else %}
+            Прежде чем принимать решение об обработке, покажите растение агроному:
+            он подтвердит диагноз и оценит, насколько сильно поражён посев.
+          {% endif %}
+        </p>
         <p class="hint">
-          Результат — подсказка модели, а не диагноз. При сомнениях покажите растение агроному.
+          Результат — подсказка модели, а не диагноз. На контрольных снимках модель
+          ошибается примерно в трёх случаях из десяти.
         </p>
       </section>
     {% endif %}
@@ -70,7 +89,7 @@
 
       <div class="actions">
         <form action="/predict" method="post">
-          <button type="submit" class="primary">{% if result %}Определить ещё раз{% else %}Определить заболевание{% endif %}</button>
+          <button type="submit" class="primary" data-busy="Определяю…">{% if result %}Определить ещё раз{% else %}Определить заболевание{% endif %}</button>
         </form>
         <form action="/reset" method="post">
           <button type="submit" class="ghost">Убрать изображение</button>
@@ -79,10 +98,11 @@
     </section>
 
     <section class="upload">
-      <h2>Заменить другой фотографией</h2>
+      <h2>Проверить другую фотографию</h2>
       <form action="/upload" method="post" enctype="multipart/form-data">
         <input type="file" name="photo" accept="image/*" required>
-        <button type="submit" class="primary">Заменить</button>
+        <button type="submit" class="primary" name="then" value="predict" data-busy="Определяю…">Заменить и определить</button>
+        <button type="submit" class="ghost" data-busy="Загружаю…">Только заменить</button>
       </form>
     </section>
   {% else %}
@@ -90,7 +110,8 @@
       <h2>Выберите изображение</h2>
       <form action="/upload" method="post" enctype="multipart/form-data">
         <input type="file" name="photo" accept="image/*" required>
-        <button type="submit" class="primary">Загрузить</button>
+        <button type="submit" class="primary" name="then" value="predict" data-busy="Определяю…">Определить заболевание</button>
+        <button type="submit" class="ghost" data-busy="Загружаю…">Только загрузить</button>
       </form>
       <p class="hint">
         Форматы: {{ allowed_formats|join(', ') }}. Размер файла — до {{ max_upload_mb }} МБ.
@@ -108,7 +129,7 @@
   </section>
 
   <footer>
-    <p>Этап 6: распознавание заболевания по фотографии. Версия {{ version }}.</p>
+    <p>MVP, версия {{ version }}. Изображения для обучения — Long et al., 2023, CC-BY-4.0.</p>
   </footer>
 </main>
 </body>

@@ -3,7 +3,7 @@ from __future__ import annotations
 from collections.abc import AsyncIterator
 from contextlib import asynccontextmanager
 
-from fastapi import FastAPI, File, Request, Response, UploadFile
+from fastapi import FastAPI, File, Form, Request, Response, UploadFile
 from fastapi.responses import FileResponse, HTMLResponse, RedirectResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
@@ -62,13 +62,15 @@ CLASSES = load_dataset_config()["classes"]
 def render(
     request: Request,
     *,
+    token: str | None = None,
     error: str | None = None,
     notice: str | None = None,
-    result: dict | None = None,
     status_code: int = 200,
 ) -> HTMLResponse:
-    token = request.cookies.get(UPLOAD_COOKIE)
+    token = token or request.cookies.get(UPLOAD_COOKIE)
     image = storage.describe(token)
+    stored = storage.load_prediction(token) if image else None
+    result = describe_prediction(stored) if stored else None
     return templates.TemplateResponse(
         request=request,
         name="index.html",
@@ -87,19 +89,49 @@ def render(
     )
 
 
-def describe_prediction(prediction: Prediction) -> dict:
+def describe_prediction(stored: dict) -> dict:
     ranked = [
-        {"class_name": name, "class_ru": CLASSES[name]["ru"], "probability": value}
-        for name, value in sorted(prediction.probabilities.items(), key=lambda item: -item[1])
+        {
+            "class_name": name,
+            "class_ru": CLASSES[name]["ru"],
+            "symptoms": CLASSES[name].get("symptoms", ""),
+            "probability": value,
+        }
+        for name, value in sorted(stored["probabilities"].items(), key=lambda item: -item[1])
+        if name in CLASSES
     ]
+    best = ranked[0]
+    low_confidence = best["probability"] < LOW_CONFIDENCE_THRESHOLD
     return {
-        "class_name": prediction.class_name,
-        "class_ru": prediction.class_ru,
-        "confidence": prediction.confidence,
-        "low_confidence": prediction.confidence < LOW_CONFIDENCE_THRESHOLD,
+        "class_name": best["class_name"],
+        "class_ru": best["class_ru"],
+        "confidence": best["probability"],
+        "is_healthy": best["class_name"] == "healthy",
+        "low_confidence": low_confidence,
         "runner_up": ranked[1] if len(ranked) > 1 else None,
+        "compare": ranked[:2] if low_confidence else ranked[:1],
         "ranked": ranked,
     }
+
+
+def recognise(token: str, image: storage.StoredImage) -> tuple[str, int] | None:
+    try:
+        prediction: Prediction = run_model(image.path)
+    except FileNotFoundError:
+        MODEL_STATE["loaded"] = False
+        return "Модель недоступна: не найден файл весов. Обратитесь к администратору.", 503
+    except (OSError, ValueError):
+        return "Не удалось обработать изображение моделью. Попробуйте другую фотографию.", 422
+    MODEL_STATE["loaded"] = True
+    storage.save_prediction(
+        token,
+        {
+            "class_name": prediction.class_name,
+            "confidence": prediction.confidence,
+            "probabilities": prediction.probabilities,
+        },
+    )
+    return None
 
 
 @app.get("/", response_class=HTMLResponse)
@@ -108,7 +140,11 @@ def index(request: Request) -> HTMLResponse:
 
 
 @app.post("/upload")
-async def upload(request: Request, photo: UploadFile = File(...)) -> Response:
+async def upload(
+    request: Request,
+    photo: UploadFile = File(...),
+    then: str = Form(""),
+) -> Response:
     raw = await photo.read()
 
     try:
@@ -118,7 +154,12 @@ async def upload(request: Request, photo: UploadFile = File(...)) -> Response:
 
     storage.delete(request.cookies.get(UPLOAD_COOKIE))
 
-    response = RedirectResponse(url="/", status_code=303)
+    failure = recognise(stored.token, stored) if then == "predict" else None
+    if failure:
+        message, status_code = failure
+        response = render(request, token=stored.token, error=message, status_code=status_code)
+    else:
+        response = RedirectResponse(url="/", status_code=303)
     response.set_cookie(
         UPLOAD_COOKIE,
         stored.token,
@@ -150,27 +191,16 @@ def current_image(request: Request) -> Response:
 
 
 @app.post("/predict")
-def predict(request: Request) -> HTMLResponse:
-    image = storage.describe(request.cookies.get(UPLOAD_COOKIE))
+def predict(request: Request) -> Response:
+    token = request.cookies.get(UPLOAD_COOKIE)
+    image = storage.describe(token)
     if image is None:
         return render(request, error="Сначала выберите изображение.", status_code=400)
-    try:
-        prediction = run_model(image.path)
-    except FileNotFoundError:
-        MODEL_STATE["loaded"] = False
-        return render(
-            request,
-            error="Модель недоступна: не найден файл весов. Обратитесь к администратору.",
-            status_code=503,
-        )
-    except (OSError, ValueError):
-        return render(
-            request,
-            error="Не удалось обработать изображение моделью. Попробуйте другую фотографию.",
-            status_code=422,
-        )
-    MODEL_STATE["loaded"] = True
-    return render(request, result=describe_prediction(prediction))
+    failure = recognise(str(token), image)
+    if failure:
+        message, status_code = failure
+        return render(request, error=message, status_code=status_code)
+    return RedirectResponse(url="/", status_code=303)
 
 
 @app.get("/health")

@@ -156,6 +156,32 @@ section.empty {
   font-variant-numeric: tabular-nums;
 }
 
+.symptoms {
+  margin-top: 20px;
+  padding-top: 16px;
+  border-top: 1px solid var(--border);
+}
+
+.symptoms h3 {
+  margin: 0 0 8px;
+  font-size: 15px;
+}
+
+.symptoms p,
+.advice {
+  margin: 0 0 8px;
+  font-size: 15px;
+}
+
+.advice {
+  margin-top: 12px;
+}
+
+button:disabled {
+  opacity: 0.6;
+  cursor: progress;
+}
+
 .preview img {
   display: block;
   width: 100%;

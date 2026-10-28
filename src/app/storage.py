@@ -127,15 +127,34 @@ def _write_meta(stored: StoredImage) -> None:
     )
 
 
-def _read_original_name(token: str, fallback: str) -> str:
+def _read_meta(token: str) -> dict:
     path = _meta_path(token)
     if not path.is_file():
-        return fallback
+        return {}
     try:
-        name = json.loads(path.read_text(encoding="utf-8")).get("original_name")
+        meta = json.loads(path.read_text(encoding="utf-8"))
     except (json.JSONDecodeError, OSError):
-        return fallback
+        return {}
+    return meta if isinstance(meta, dict) else {}
+
+
+def _read_original_name(token: str, fallback: str) -> str:
+    name = _read_meta(token).get("original_name")
     return Path(str(name)).name if name else fallback
+
+
+def save_prediction(token: str, prediction: dict) -> None:
+    if resolve(token) is None:
+        return
+    meta = _read_meta(token) | {"prediction": prediction}
+    _meta_path(token).write_text(json.dumps(meta, ensure_ascii=False), encoding="utf-8")
+
+
+def load_prediction(token: str | None) -> dict | None:
+    if resolve(token) is None:
+        return None
+    prediction = _read_meta(str(token)).get("prediction")
+    return prediction if isinstance(prediction, dict) else None
 
 
 def resolve(token: str | None) -> Path | None:
