@@ -31,6 +31,7 @@ REPORTS_DIR = PROJECT_ROOT / "reports"
 STAGE2_REPORTS_DIR = REPORTS_DIR / "stage2"
 STAGE3_REPORTS_DIR = REPORTS_DIR / "stage3"
 STAGE4_REPORTS_DIR = REPORTS_DIR / "stage4"
+STAGE5_REPORTS_DIR = REPORTS_DIR / "stage5"
 PREVIEWS_DIR = STAGE3_REPORTS_DIR / "previews"
 
 APP_DIR = PROJECT_ROOT / "src" / "app"
@@ -62,6 +63,7 @@ def ensure_dirs() -> None:
         STAGE2_REPORTS_DIR,
         STAGE3_REPORTS_DIR,
         STAGE4_REPORTS_DIR,
+        STAGE5_REPORTS_DIR,
         PREVIEWS_DIR,
     ):
         directory.mkdir(parents=True, exist_ok=True)
