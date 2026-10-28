@@ -1,0 +1,6 @@
+source_split: test
+min_images_per_class: 15
+confidence_level: 0.95
+recall_floor: 0.2
+sheet_thumbnail_px: 150
+sheet_cols: 6

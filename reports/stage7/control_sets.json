@@ -1,0 +1,30 @@
+{
+  "source_split": "data/processed/splits/test.csv",
+  "classes": {
+    "healthy": {
+      "file": "data/control/healthy.csv",
+      "images": 18,
+      "scenes": 18
+    },
+    "yellow_rust": {
+      "file": "data/control/yellow_rust.csv",
+      "images": 36,
+      "scenes": 36
+    },
+    "brown_rust": {
+      "file": "data/control/brown_rust.csv",
+      "images": 19,
+      "scenes": 19
+    },
+    "septoria": {
+      "file": "data/control/septoria.csv",
+      "images": 52,
+      "scenes": 52
+    },
+    "mildew": {
+      "file": "data/control/mildew.csv",
+      "images": 24,
+      "scenes": 24
+    }
+  }
+}

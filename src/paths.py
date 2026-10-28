@@ -10,6 +10,7 @@ PROJECT_ROOT = Path(__file__).resolve().parents[1]
 CONFIGS_DIR = PROJECT_ROOT / "configs"
 DATASET_CONFIG = CONFIGS_DIR / "dataset.yaml"
 TRAIN_CONFIG = CONFIGS_DIR / "train.yaml"
+CONTROL_CONFIG = CONFIGS_DIR / "control.yaml"
 
 DATA_DIR = PROJECT_ROOT / "data"
 RAW_DIR = DATA_DIR / "raw"
@@ -21,6 +22,7 @@ INVENTORY_CSV = INTERIM_DIR / "inventory.csv"
 DUPLICATES_CSV = INTERIM_DIR / "duplicates.csv"
 CLEAN_CSV = INTERIM_DIR / "clean.csv"
 SPLITS_DIR = PROCESSED_DIR / "splits"
+CONTROL_DIR = DATA_DIR / "control"
 
 UPLOADS_DIR = DATA_DIR / "uploads"
 
@@ -32,6 +34,7 @@ STAGE2_REPORTS_DIR = REPORTS_DIR / "stage2"
 STAGE3_REPORTS_DIR = REPORTS_DIR / "stage3"
 STAGE4_REPORTS_DIR = REPORTS_DIR / "stage4"
 STAGE5_REPORTS_DIR = REPORTS_DIR / "stage5"
+STAGE7_REPORTS_DIR = REPORTS_DIR / "stage7"
 PREVIEWS_DIR = STAGE3_REPORTS_DIR / "previews"
 
 APP_DIR = PROJECT_ROOT / "src" / "app"
@@ -52,18 +55,24 @@ def load_train_config(path: Path | None = None) -> dict[str, Any]:
     return load_yaml(path or TRAIN_CONFIG)
 
 
+def load_control_config(path: Path | None = None) -> dict[str, Any]:
+    return load_yaml(path or CONTROL_CONFIG)
+
+
 def ensure_dirs() -> None:
     for directory in (
         RAW_DIR,
         INTERIM_DIR,
         PROCESSED_DIR,
         SPLITS_DIR,
+        CONTROL_DIR,
         UPLOADS_DIR,
         MODELS_DIR,
         STAGE2_REPORTS_DIR,
         STAGE3_REPORTS_DIR,
         STAGE4_REPORTS_DIR,
         STAGE5_REPORTS_DIR,
+        STAGE7_REPORTS_DIR,
         PREVIEWS_DIR,
     ):
         directory.mkdir(parents=True, exist_ok=True)

@@ -1,0 +1,190 @@
+{
+  "control_sets": {
+    "healthy": "data/control/healthy.csv",
+    "yellow_rust": "data/control/yellow_rust.csv",
+    "brown_rust": "data/control/brown_rust.csv",
+    "septoria": "data/control/septoria.csv",
+    "mildew": "data/control/mildew.csv"
+  },
+  "declared_classes": [
+    "healthy",
+    "yellow_rust",
+    "brown_rust",
+    "septoria",
+    "mildew"
+  ],
+  "model_classes": [
+    "healthy",
+    "yellow_rust",
+    "brown_rust",
+    "septoria",
+    "mildew"
+  ],
+  "interface_classes": [
+    "healthy",
+    "yellow_rust",
+    "brown_rust",
+    "septoria",
+    "mildew"
+  ],
+  "undeclared_in_model": [],
+  "recall_floor": 0.2,
+  "confidence_level": 0.95,
+  "images": 149,
+  "answered": 149,
+  "correct": 106,
+  "agreement_with_stage5": 1.0,
+  "per_class": {
+    "healthy": {
+      "images": 18,
+      "answered": 18,
+      "correct": 11,
+      "recall": 0.6111,
+      "recall_ci": [
+        0.3862,
+        0.797
+      ],
+      "precision": 0.6875,
+      "top2": 0.8333,
+      "mean_confidence": 0.7756,
+      "low_confidence_share": 0.1667,
+      "main_confusion": {
+        "class_name": "mildew",
+        "images": 3
+      },
+      "support": {
+        "config": true,
+        "model": true,
+        "interface": true
+      },
+      "checks": {
+        "declared_everywhere": true,
+        "files_intact": true,
+        "all_answered": true,
+        "recognised_above_chance": true
+      },
+      "passed": true
+    },
+    "yellow_rust": {
+      "images": 36,
+      "answered": 36,
+      "correct": 33,
+      "recall": 0.9167,
+      "recall_ci": [
+        0.7817,
+        0.9713
+      ],
+      "precision": 0.6,
+      "top2": 0.9722,
+      "mean_confidence": 0.8117,
+      "low_confidence_share": 0.1389,
+      "main_confusion": {
+        "class_name": "septoria",
+        "images": 2
+      },
+      "support": {
+        "config": true,
+        "model": true,
+        "interface": true
+      },
+      "checks": {
+        "declared_everywhere": true,
+        "files_intact": true,
+        "all_answered": true,
+        "recognised_above_chance": true
+      },
+      "passed": true
+    },
+    "brown_rust": {
+      "images": 19,
+      "answered": 19,
+      "correct": 9,
+      "recall": 0.4737,
+      "recall_ci": [
+        0.2733,
+        0.6829
+      ],
+      "precision": 0.6923,
+      "top2": 0.8947,
+      "mean_confidence": 0.6693,
+      "low_confidence_share": 0.3158,
+      "main_confusion": {
+        "class_name": "yellow_rust",
+        "images": 6
+      },
+      "support": {
+        "config": true,
+        "model": true,
+        "interface": true
+      },
+      "checks": {
+        "declared_everywhere": true,
+        "files_intact": true,
+        "all_answered": true,
+        "recognised_above_chance": true
+      },
+      "passed": true
+    },
+    "septoria": {
+      "images": 52,
+      "answered": 52,
+      "correct": 32,
+      "recall": 0.6154,
+      "recall_ci": [
+        0.4796,
+        0.7353
+      ],
+      "precision": 0.8649,
+      "top2": 0.8462,
+      "mean_confidence": 0.7407,
+      "low_confidence_share": 0.25,
+      "main_confusion": {
+        "class_name": "yellow_rust",
+        "images": 14
+      },
+      "support": {
+        "config": true,
+        "model": true,
+        "interface": true
+      },
+      "checks": {
+        "declared_everywhere": true,
+        "files_intact": true,
+        "all_answered": true,
+        "recognised_above_chance": true
+      },
+      "passed": true
+    },
+    "mildew": {
+      "images": 24,
+      "answered": 24,
+      "correct": 21,
+      "recall": 0.875,
+      "recall_ci": [
+        0.69,
+        0.9566
+      ],
+      "precision": 0.75,
+      "top2": 0.9167,
+      "mean_confidence": 0.8404,
+      "low_confidence_share": 0.1667,
+      "main_confusion": {
+        "class_name": "septoria",
+        "images": 1
+      },
+      "support": {
+        "config": true,
+        "model": true,
+        "interface": true
+      },
+      "checks": {
+        "declared_everywhere": true,
+        "files_intact": true,
+        "all_answered": true,
+        "recognised_above_chance": true
+      },
+      "passed": true
+    }
+  },
+  "passed": true
+}
