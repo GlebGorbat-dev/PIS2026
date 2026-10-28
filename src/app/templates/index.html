@@ -24,6 +24,40 @@
   {% endif %}
 
   {% if image %}
+    {% if result %}
+      <section class="result" aria-live="polite">
+        <h2>Результат распознавания</h2>
+        <p class="verdict">
+          <span class="verdict-name">{{ result.class_ru }}</span>
+          <code>{{ result.class_name }}</code>
+        </p>
+        <p class="confidence">
+          Уверенность модели: <strong>{{ '%.0f'|format(result.confidence * 100) }}%</strong>
+        </p>
+
+        {% if result.low_confidence %}
+          <p class="message notice" role="status">
+            Модель не уверена в ответе. Второй вариант —
+            {{ result.runner_up.class_ru|lower }} ({{ '%.0f'|format(result.runner_up.probability * 100) }}%).
+            Попробуйте снять лист крупнее и при хорошем освещении.
+          </p>
+        {% endif %}
+
+        <ul class="probabilities">
+          {% for item in result.ranked %}
+            <li>
+              <span class="label">{{ item.class_ru }}</span>
+              <span class="bar" aria-hidden="true"><span style="width: {{ '%.1f'|format(item.probability * 100) }}%"></span></span>
+              <span class="value">{{ '%.1f'|format(item.probability * 100) }}%</span>
+            </li>
+          {% endfor %}
+        </ul>
+        <p class="hint">
+          Результат — подсказка модели, а не диагноз. При сомнениях покажите растение агроному.
+        </p>
+      </section>
+    {% endif %}
+
     <section class="preview">
       <h2>Выбранное изображение</h2>
       <img src="/image?v={{ image.token }}" alt="Загруженная фотография растения">
@@ -36,7 +70,7 @@
 
       <div class="actions">
         <form action="/predict" method="post">
-          <button type="submit" class="primary">Определить заболевание</button>
+          <button type="submit" class="primary">{% if result %}Определить ещё раз{% else %}Определить заболевание{% endif %}</button>
         </form>
         <form action="/reset" method="post">
           <button type="submit" class="ghost">Убрать изображение</button>
@@ -74,7 +108,7 @@
   </section>
 
   <footer>
-    <p>Этап 2: приём произвольного изображения. Версия {{ version }}.</p>
+    <p>Этап 6: распознавание заболевания по фотографии. Версия {{ version }}.</p>
   </footer>
 </main>
 </body>

@@ -156,17 +156,9 @@ def test_foreign_token_gives_no_access(client):
     assert client.get("/image").status_code == 404
 
 
-def test_predict_is_not_available_until_stage_six(client):
-    client.post("/upload", files={"photo": ("leaf.png", make_image(), "image/png")})
-    response = client.post("/predict")
-    assert response.status_code == 501
-    assert "этапе 6" in response.text
-
-
-def test_health_reports_classes_and_no_model(client):
+def test_health_reports_classes(client):
     payload = client.get("/health").json()
     assert payload["status"] == "ok"
-    assert payload["model_loaded"] is False
     assert payload["classes"] == [
         "brown_rust",
         "healthy",

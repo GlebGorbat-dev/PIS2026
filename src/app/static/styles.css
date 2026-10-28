@@ -81,6 +81,81 @@ section.empty {
   border-color: #e8dcb5;
 }
 
+.result {
+  border-color: var(--green);
+  border-width: 2px;
+}
+
+.verdict {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 10px;
+  margin: 0;
+}
+
+.verdict-name {
+  font-size: 26px;
+  font-weight: 600;
+  line-height: 1.2;
+}
+
+.verdict code,
+.classes code {
+  padding: 1px 5px;
+  background: var(--green-light);
+  border-radius: 4px;
+  font-size: 13px;
+}
+
+.confidence {
+  margin: 6px 0 0;
+  color: var(--muted);
+}
+
+.confidence strong {
+  color: var(--text);
+}
+
+.result .message {
+  margin-top: 16px;
+}
+
+.probabilities {
+  display: grid;
+  gap: 8px;
+  margin: 18px 0 0;
+  padding: 0;
+  list-style: none;
+  font-size: 14px;
+}
+
+.probabilities li {
+  display: grid;
+  grid-template-columns: minmax(120px, 170px) 1fr 52px;
+  align-items: center;
+  gap: 12px;
+}
+
+.probabilities .bar {
+  height: 10px;
+  background: #f2f3f0;
+  border-radius: 5px;
+  overflow: hidden;
+}
+
+.probabilities .bar span {
+  display: block;
+  height: 100%;
+  background: var(--green);
+  border-radius: 5px;
+}
+
+.probabilities .value {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+
 .preview img {
   display: block;
   width: 100%;
@@ -172,12 +247,6 @@ button.ghost:hover {
   padding-left: 20px;
 }
 
-.classes code {
-  padding: 1px 5px;
-  background: var(--green-light);
-  border-radius: 4px;
-  font-size: 13px;
-}
 
 footer {
   margin-top: 28px;
