@@ -18,6 +18,7 @@ from src.paths import (
     ensure_dirs,
     load_dataset_config,
     relative_to_root,
+    resolve_data_paths,
 )
 
 
@@ -57,20 +58,26 @@ def similar_pairs(frame: pd.DataFrame, threshold: int) -> list[tuple[str, str, i
 
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(description="Найти и удалить дубликаты.")
-    parser.add_argument("--inventory", type=Path, default=INVENTORY_CSV, help="путь к inventory.csv")
+    parser.add_argument("--config", type=Path, default=None)
+    parser.add_argument("--inventory", type=Path, default=None, help="путь к inventory.csv")
     args = parser.parse_args(argv)
 
-    if not args.inventory.exists():
-        print(f"Нет {args.inventory}. Сначала: python -m src.data.inventory")
-        return 1
-
     ensure_dirs()
-    config = load_dataset_config()
+    config = load_dataset_config(args.config)
+    data_paths = resolve_data_paths(config)
+    inventory_path = args.inventory or (data_paths["inventory_csv"] if args.config else INVENTORY_CSV)
+    duplicates_csv = data_paths["duplicates_csv"] if args.config else DUPLICATES_CSV
+    clean_csv = data_paths["clean_csv"] if args.config else CLEAN_CSV
+    reports_dir = data_paths["reports_dir"] if args.config else STAGE3_REPORTS_DIR
+
+    if not inventory_path.exists():
+        print(f"Нет {inventory_path}. Сначала: python -m src.data.inventory")
+        return 1
     dedup_config = config["deduplication"]
     exact_threshold = dedup_config["phash_hamming_threshold"]
     scene_threshold = dedup_config["scene_group_hamming_threshold"]
 
-    inventory = pd.read_csv(args.inventory)
+    inventory = pd.read_csv(inventory_path)
     usable = inventory[inventory["status"] == "ok"].copy().sort_values("path").reset_index(drop=True)
     print(f"Годных изображений на входе: {len(usable)}")
 
@@ -153,8 +160,9 @@ def main(argv: list[str] | None = None) -> int:
         removal_records,
         columns=["path", "kind", "kept_instead", "distance", "md5", "class_name", "kept_class"],
     )
-    duplicates.to_csv(DUPLICATES_CSV, index=False)
-    clean.to_csv(CLEAN_CSV, index=False)
+    duplicates_csv.parent.mkdir(parents=True, exist_ok=True)
+    duplicates.to_csv(duplicates_csv, index=False)
+    clean.to_csv(clean_csv, index=False)
 
     summary = {
         "input_ok_images": int(len(usable)),
@@ -179,7 +187,8 @@ def main(argv: list[str] | None = None) -> int:
             for c in conflicts
         ],
     }
-    report_path = STAGE3_REPORTS_DIR / "dedup_summary.json"
+    reports_dir.mkdir(parents=True, exist_ok=True)
+    report_path = reports_dir / "dedup_summary.json"
     report_path.write_text(json.dumps(summary, ensure_ascii=False, indent=2), encoding="utf-8")
 
     print(
@@ -193,8 +202,8 @@ def main(argv: list[str] | None = None) -> int:
     )
     if conflicts:
         print(f"ВНИМАНИЕ: конфликтов разметки — {len(conflicts)}, см. отчёт")
-    print(f"\nСписок удалённых: {relative_to_root(DUPLICATES_CSV)}")
-    print(f"Чистый набор:     {relative_to_root(CLEAN_CSV)}")
+    print(f"\nСписок удалённых: {relative_to_root(duplicates_csv)}")
+    print(f"Чистый набор:     {relative_to_root(clean_csv)}")
     print(f"Сводка:           {relative_to_root(report_path)}")
     return 0
 

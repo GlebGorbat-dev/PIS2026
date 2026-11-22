@@ -48,6 +48,34 @@ header {
   border-bottom: 1px solid var(--border);
 }
 
+.crop-picker {
+  margin-top: 18px;
+}
+
+.crop-picker fieldset {
+  margin: 0;
+  padding: 10px 14px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 18px;
+  background: #fff;
+}
+
+.crop-picker legend {
+  padding: 0 6px;
+  color: var(--muted);
+  font-size: 13px;
+}
+
+.crop-picker label {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  cursor: pointer;
+}
+
 section {
   margin-top: 28px;
   padding: 22px;

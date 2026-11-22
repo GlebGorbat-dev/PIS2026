@@ -1,0 +1,116 @@
+{
+  "split": "val",
+  "split_csv": "data/processed/splits/maize/val.csv",
+  "split_csv_md5": "454af1322481dffec91ad3c5b14b595f",
+  "weights": "models/maize.pt",
+  "weights_md5": "252670f11ac88f5b404245fb97aa214d",
+  "architecture": "mobilenet_v3_small",
+  "best_val_accuracy_at_training": 0.9583,
+  "device": "mps",
+  "classes": [
+    "healthy",
+    "blight",
+    "gray_spot",
+    "fall_armyworm"
+  ],
+  "images": 288,
+  "accuracy": 0.9583,
+  "balanced_accuracy": 0.9608,
+  "top2_accuracy": 0.9931,
+  "macro": {
+    "precision": 0.9595,
+    "recall": 0.9608,
+    "f1": 0.9601
+  },
+  "weighted": {
+    "precision": 0.9582,
+    "recall": 0.9583,
+    "f1": 0.9582
+  },
+  "mAP": 0.98,
+  "roc_auc_macro_ovr": 0.9919,
+  "log_loss": 0.1945,
+  "expected_calibration_error": 0.0308,
+  "mean_confidence_correct": 0.9808,
+  "mean_confidence_wrong": 0.8372,
+  "count_error": {
+    "mae_per_class": 0.5,
+    "misassigned_share": 0.0035
+  },
+  "per_class": {
+    "healthy": {
+      "precision": 0.9818,
+      "recall": 1.0,
+      "f1": 0.9908,
+      "average_precision": 0.999,
+      "support": 54,
+      "predicted_count": 55,
+      "count_error": 1
+    },
+    "blight": {
+      "precision": 0.9306,
+      "recall": 0.9178,
+      "f1": 0.9241,
+      "average_precision": 0.9501,
+      "support": 73,
+      "predicted_count": 72,
+      "count_error": -1
+    },
+    "gray_spot": {
+      "precision": 0.9634,
+      "recall": 0.9634,
+      "f1": 0.9634,
+      "average_precision": 0.9913,
+      "support": 82,
+      "predicted_count": 82,
+      "count_error": 0
+    },
+    "fall_armyworm": {
+      "precision": 0.962,
+      "recall": 0.962,
+      "f1": 0.962,
+      "average_precision": 0.9795,
+      "support": 79,
+      "predicted_count": 79,
+      "count_error": 0
+    }
+  },
+  "confusion_matrix": [
+    [
+      54,
+      0,
+      0,
+      0
+    ],
+    [
+      0,
+      67,
+      3,
+      3
+    ],
+    [
+      1,
+      2,
+      79,
+      0
+    ],
+    [
+      0,
+      3,
+      0,
+      76
+    ]
+  ],
+  "bootstrap": {
+    "rounds": 200,
+    "seed": 42,
+    "accuracy_95ci": [
+      0.9339,
+      0.9758
+    ],
+    "macro_f1_95ci": [
+      0.9369,
+      0.9773
+    ]
+  }
+}

@@ -1,0 +1,60 @@
+{
+  "root": "data/raw/barley/extracted",
+  "files_indexed": 2352,
+  "declared_image_count": 2352,
+  "ok": 2352,
+  "rejected": 0,
+  "reject_reasons": {},
+  "classes_declared": [
+    "brown_rust",
+    "healthy",
+    "ramularia"
+  ],
+  "classes_found": [
+    "brown_rust",
+    "healthy",
+    "ramularia"
+  ],
+  "classes_missing": [],
+  "unmapped_labels": {},
+  "per_class": {
+    "brown_rust": {
+      "total": 350,
+      "ok": 350,
+      "rejected": 0
+    },
+    "healthy": {
+      "total": 1559,
+      "ok": 1559,
+      "rejected": 0
+    },
+    "ramularia": {
+      "total": 443,
+      "ok": 443,
+      "rejected": 0
+    }
+  },
+  "label_source_to_class": {
+    "brown_rust": [
+      "brown_rust"
+    ],
+    "healthy": [
+      "healthy"
+    ],
+    "ramularia": [
+      "ramularia"
+    ]
+  },
+  "resolution": {
+    "width_min": 512,
+    "width_max": 512,
+    "height_min": 512,
+    "height_max": 512
+  },
+  "modes": {
+    "RGB": 2352
+  },
+  "formats": {
+    "JPEG": 2352
+  }
+}

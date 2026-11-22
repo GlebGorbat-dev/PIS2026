@@ -1,0 +1,67 @@
+crop: maize
+source:
+  name: "MLD: A Multi-Class Maize Leaf Disease Image Dataset from Bangladesh (2025)"
+  doi: "10.17632/3myfctrgk3.1"
+  record_url: "https://data.mendeley.com/datasets/3myfctrgk3/1"
+  download_url: "https://data.mendeley.com/public-files/datasets/3myfctrgk3/files/691a1e78-dd69-43ee-a624-77df3e2f6a84/file_downloaded"
+  archive_name: "maize_leaf_disease.zip"
+  archive_md5: "5860d1fe0fb7880e368e4547be7ecfd0"
+  license: "CC-BY-4.0"
+  citation: >-
+    Ahmed, F. (2026). MLD: A Multi-Class Maize Leaf Disease Image Dataset
+    from Bangladesh (2025) [Data set]. Mendeley Data.
+    https://doi.org/10.17632/3myfctrgk3.1
+  declared_image_count: 1996
+  notes: >-
+    1996 снимков листьев кукурузы, снятых в Бангладеш на смартфон и уменьшенных
+    до 640×480. Четыре класса: ожог листа, серая пятнистость, повреждение
+    совкой и здоровый лист.
+
+paths:
+  raw_images: data/raw/maize/extracted
+  inventory_csv: data/interim/maize/inventory.csv
+  duplicates_csv: data/interim/maize/duplicates.csv
+  clean_csv: data/interim/maize/clean.csv
+  splits_dir: data/processed/splits/maize
+  reports_dir: reports/crops/maize
+
+classes:
+  healthy:
+    ru: "Здоровый лист"
+    aliases: ["healthy"]
+    symptoms: >-
+      Лист равномерно зелёный, без пятен, полос, погрызов и налёта.
+  blight:
+    ru: "Ожог листа"
+    aliases: ["blight", "leaf_blight"]
+    symptoms: >-
+      Вытянутые серо-коричневые пятна вдоль листа, часто с жёлтой каймой.
+      Позже пятна сливаются и лист засыхает.
+  gray_spot:
+    ru: "Серая пятнистость"
+    aliases: ["gray_spot", "gray spot"]
+    symptoms: >-
+      Прямоугольные серые или светло-коричневые пятна, ограниченные жилками.
+  fall_armyworm:
+    ru: "Повреждение совкой"
+    aliases: ["fall_armyworm", "fall armyworm"]
+    symptoms: >-
+      Окна и погрызы в листовой пластинке, рваные края, иногда тёмные экскременты.
+      Это след насекомого, а не грибной болезни.
+
+quality_filters:
+  min_side_px: 64
+  min_file_bytes: 2048
+  allowed_extensions: [".jpg", ".jpeg", ".png", ".bmp", ".tif", ".tiff"]
+
+deduplication:
+  exact: true
+  phash_hamming_threshold: 4
+  scene_group_hamming_threshold: 12
+
+split:
+  train: 0.70
+  val: 0.15
+  test: 0.15
+  random_seed: 42
+  group_near_duplicates: true

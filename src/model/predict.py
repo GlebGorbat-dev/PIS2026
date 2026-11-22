@@ -11,9 +11,9 @@ from PIL import Image
 
 from src.model.architecture import build_model, pick_device
 from src.model.dataset import build_transforms
-from src.paths import STAGE4_CHECKPOINT, load_dataset_config
+from src.paths import CROP_CHECKPOINTS, STAGE4_CHECKPOINT, load_dataset_config
 
-_CACHE: tuple | None = None
+_CACHE: dict[tuple, dict] | None = {}
 
 
 @dataclass(frozen=True)
@@ -36,11 +36,14 @@ def _to_image(source: Image.Image | Path | str | bytes) -> Image.Image:
 
 def load_checkpoint(path: Path | None = None, device: torch.device | None = None):
     global _CACHE
+    if _CACHE is None:
+        _CACHE = {}
     checkpoint_path = path or STAGE4_CHECKPOINT
     device = device or pick_device()
     cache_key = (str(checkpoint_path), str(device))
-    if _CACHE is not None and _CACHE[0] == cache_key:
-        return _CACHE[1]
+    cached = _CACHE.get(cache_key)
+    if cached is not None:
+        return cached
 
     if not checkpoint_path.exists():
         raise FileNotFoundError(
@@ -59,15 +62,17 @@ def load_checkpoint(path: Path | None = None, device: torch.device | None = None
     model.to(device)
     model.eval()
     transform = build_transforms(train_config, train=False)
+    labels = payload.get("labels") or load_dataset_config()["classes"]
     bundle = {
         "model": model,
         "class_names": class_names,
         "config": train_config,
         "transform": transform,
         "device": device,
-        "labels": load_dataset_config()["classes"],
+        "labels": labels,
+        "crop": payload.get("crop", "wheat"),
     }
-    _CACHE = (cache_key, bundle)
+    _CACHE[cache_key] = bundle
     return bundle
 
 
@@ -86,9 +91,10 @@ def predict(
         name: float(probabilities[i].item())
         for i, name in enumerate(bundle["class_names"])
     }
+    label_meta = bundle["labels"].get(class_name) or {}
     return Prediction(
         class_name=class_name,
-        class_ru=bundle["labels"][class_name]["ru"],
+        class_ru=label_meta.get("ru", class_name),
         confidence=float(probabilities[index].item()),
         probabilities=probs,
     )
@@ -98,11 +104,13 @@ def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(description="Предсказать класс по фотографии.")
     parser.add_argument("image", type=Path, help="путь к изображению")
     parser.add_argument("--weights", type=Path, default=None)
+    parser.add_argument("--crop", choices=sorted(CROP_CHECKPOINTS), default=None)
     args = parser.parse_args(argv)
     if not args.image.exists():
         print(f"Нет файла {args.image}")
         return 1
-    result = predict(args.image, weights_path=args.weights)
+    weights = args.weights or (CROP_CHECKPOINTS[args.crop] if args.crop else None)
+    result = predict(args.image, weights_path=weights)
     print(f"{result.class_name} ({result.class_ru})  уверенность {result.confidence:.3f}")
     for name, value in sorted(result.probabilities.items(), key=lambda item: -item[1]):
         print(f"  {name:12} {value:.3f}")

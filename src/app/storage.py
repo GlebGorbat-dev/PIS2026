@@ -150,6 +150,16 @@ def save_prediction(token: str, prediction: dict) -> None:
     _meta_path(token).write_text(json.dumps(meta, ensure_ascii=False), encoding="utf-8")
 
 
+def clear_prediction(token: str | None) -> None:
+    if resolve(token) is None:
+        return
+    meta = _read_meta(str(token))
+    if "prediction" not in meta:
+        return
+    meta.pop("prediction", None)
+    _meta_path(str(token)).write_text(json.dumps(meta, ensure_ascii=False), encoding="utf-8")
+
+
 def load_prediction(token: str | None) -> dict | None:
     if resolve(token) is None:
         return None

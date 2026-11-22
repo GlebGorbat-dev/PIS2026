@@ -1,0 +1,60 @@
+{
+  "clean_images": 2227,
+  "target_ratios": {
+    "train": 0.7,
+    "val": 0.15,
+    "test": 0.15
+  },
+  "random_seed": 42,
+  "group_near_duplicates": true,
+  "counts_per_split": {
+    "train": 1548,
+    "val": 366,
+    "test": 313
+  },
+  "actual_ratios": {
+    "train": 0.6951,
+    "val": 0.1643,
+    "test": 0.1405
+  },
+  "counts_per_class_split": {
+    "brown_rust": {
+      "train": 231,
+      "val": 87,
+      "test": 26
+    },
+    "healthy": {
+      "train": 1015,
+      "val": 214,
+      "test": 222
+    },
+    "ramularia": {
+      "train": 302,
+      "val": 65,
+      "test": 65
+    }
+  },
+  "class_share_per_split": {
+    "train": {
+      "brown_rust": 0.1492,
+      "healthy": 0.6557,
+      "ramularia": 0.1951
+    },
+    "val": {
+      "brown_rust": 0.2377,
+      "healthy": 0.5847,
+      "ramularia": 0.1776
+    },
+    "test": {
+      "brown_rust": 0.0831,
+      "healthy": 0.7093,
+      "ramularia": 0.2077
+    }
+  },
+  "scene_groups_leaked_across_splits": [],
+  "classes_missing_in_split": {
+    "train": [],
+    "val": [],
+    "test": []
+  }
+}

@@ -1,0 +1,65 @@
+crop: barley
+source:
+  name: "Barley disease segmentation (AgML / Martello et al.)"
+  doi: "10.17632/4ny92p2r8f.1"
+  record_url: "https://huggingface.co/datasets/Project-AgML/barley_disease_segmentation"
+  download_url: "https://huggingface.co/datasets/Project-AgML/barley_disease_segmentation"
+  archive_name: "barley_parquets"
+  archive_md5: ""
+  license: "CC-BY-4.0"
+  citation: >-
+    Martello, S., Genze, N., & Grimm, D. G. (2026). Deep learning–based
+    identification of visually similar foliar diseases in field-grown barley.
+    Plant Methods, 22, 41. Dataset: 10.17632/4ny92p2r8f.1
+  declared_image_count: 2352
+  notes: >-
+    Подмножество Hugging Face (5 шардов parquet, ~2385 патчей 512×512).
+    Метка класса получена из пиксельной маски: бурая ржавчина, рамулярия
+    или здоровый лист. Смешанные инфекции отбрасываются. Разбиение
+    группируется по растению (plant_id), чтобы патчи одного листа не
+    попадали сразу в train и test.
+
+paths:
+  raw_images: data/raw/barley/extracted
+  inventory_csv: data/interim/barley/inventory.csv
+  duplicates_csv: data/interim/barley/duplicates.csv
+  clean_csv: data/interim/barley/clean.csv
+  splits_dir: data/processed/splits/barley
+  reports_dir: reports/crops/barley
+
+classes:
+  healthy:
+    ru: "Здоровый лист"
+    aliases: ["healthy"]
+    symptoms: >-
+      Лист без пустул и пятен рамулярии, зелёный или естественно желтеющий.
+  brown_rust:
+    ru: "Бурая ржавчина ячменя"
+    aliases: ["brown_rust", "leaf_rust"]
+    symptoms: >-
+      Мелкие округлые оранжево-бурые пустулы, разбросанные по листу.
+      Возбудитель — Puccinia hordei.
+  ramularia:
+    ru: "Рамулярия"
+    aliases: ["ramularia", "ramularia_leaf_spot"]
+    symptoms: >-
+      Прямоугольные коричневые пятна, ограниченные жилками, часто с жёлтым
+      ореолом. Возбудитель — Ramularia collo-cygni.
+
+quality_filters:
+  min_side_px: 64
+  min_file_bytes: 2048
+  allowed_extensions: [".jpg", ".jpeg", ".png", ".bmp", ".tif", ".tiff"]
+
+deduplication:
+  exact: true
+  phash_hamming_threshold: 4
+  scene_group_hamming_threshold: 12
+
+split:
+  train: 0.70
+  val: 0.15
+  test: 0.15
+  random_seed: 42
+  group_near_duplicates: true
+  group_by_parent_dir: true

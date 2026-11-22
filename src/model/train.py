@@ -13,7 +13,7 @@ import torch
 from torch import nn
 from torch.utils.data import DataLoader
 
-from src.model.architecture import build_model, pick_device
+from src.model.architecture import build_model, pick_device, transfer_backbone
 from src.model.dataset import (
     LeafCsvDataset,
     build_transforms,
@@ -29,6 +29,7 @@ from src.paths import (
     load_dataset_config,
     load_train_config,
     relative_to_root,
+    resolve_data_paths,
 )
 
 
@@ -93,11 +94,29 @@ def save_curves(history: list[dict], path: Path) -> None:
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(description="Обучить первую модель классификации.")
     parser.add_argument("--config", type=Path, default=None)
+    parser.add_argument("--dataset-config", type=Path, default=None)
+    parser.add_argument("--splits-dir", type=Path, default=None)
+    parser.add_argument("--checkpoint", type=Path, default=None)
+    parser.add_argument("--reports-dir", type=Path, default=None)
+    parser.add_argument("--init-from", type=Path, default=None)
     args = parser.parse_args(argv)
 
     ensure_dirs()
-    dataset_config = load_dataset_config()
+    dataset_config = load_dataset_config(args.dataset_config)
     train_config = load_train_config(args.config)
+    data_paths = resolve_data_paths(dataset_config)
+    splits_dir = args.splits_dir or (data_paths["splits_dir"] if args.dataset_config else SPLITS_DIR)
+    checkpoint_value = args.checkpoint or train_config.get("checkpoint")
+    checkpoint_path = (
+        Path(checkpoint_value)
+        if checkpoint_value
+        else STAGE4_CHECKPOINT
+    )
+    if not checkpoint_path.is_absolute():
+        checkpoint_path = PROJECT_ROOT / checkpoint_path
+    reports_dir = args.reports_dir or (
+        data_paths["reports_dir"] if args.dataset_config else STAGE4_REPORTS_DIR
+    )
     names = class_names_from_config(dataset_config)
     mapping = class_to_index(names)
     seed = int(train_config["seed"])
@@ -109,13 +128,13 @@ def main(argv: list[str] | None = None) -> int:
     print(f"Классы: {names}")
 
     train_set = LeafCsvDataset(
-        SPLITS_DIR / "train.csv",
+        splits_dir / "train.csv",
         PROJECT_ROOT,
         mapping,
         build_transforms(train_config, train=True),
     )
     val_set = LeafCsvDataset(
-        SPLITS_DIR / "val.csv",
+        splits_dir / "val.csv",
         PROJECT_ROOT,
         mapping,
         build_transforms(train_config, train=False),
@@ -142,8 +161,16 @@ def main(argv: list[str] | None = None) -> int:
     total = sum(p.numel() for p in model.parameters())
     print(f"Параметров: {total}, обучаемых: {trainable}")
 
+    init_from = args.init_from or train_config.get("init_from")
+    if init_from:
+        init_path = Path(init_from)
+        if not init_path.is_absolute():
+            init_path = PROJECT_ROOT / init_path
+        transferred = transfer_backbone(model, init_path)
+        print(f"Перенесён backbone из {relative_to_root(init_path)}: слоёв {transferred}")
+
     if train_config["use_class_weights"]:
-        weights = class_weights(SPLITS_DIR / "train.csv", names, device)
+        weights = class_weights(splits_dir / "train.csv", names, device)
         print(f"Веса классов: {dict(zip(names, [round(float(w), 3) for w in weights]))}")
         criterion = nn.CrossEntropyLoss(weight=weights)
     else:
@@ -197,23 +224,26 @@ def main(argv: list[str] | None = None) -> int:
     checkpoint = {
         "model_state": best_state,
         "class_names": names,
+        "labels": dataset_config["classes"],
+        "crop": dataset_config.get("crop", "wheat"),
         "config": train_config,
         "best_val_accuracy": best_acc,
         "best_epoch": best_epoch,
         "history": history,
         "architecture": train_config["architecture"],
     }
-    STAGE4_CHECKPOINT.parent.mkdir(parents=True, exist_ok=True)
-    torch.save(checkpoint, STAGE4_CHECKPOINT)
+    checkpoint_path.parent.mkdir(parents=True, exist_ok=True)
+    torch.save(checkpoint, checkpoint_path)
 
-    STAGE4_REPORTS_DIR.mkdir(parents=True, exist_ok=True)
-    curves = STAGE4_REPORTS_DIR / "train_curves.png"
+    reports_dir.mkdir(parents=True, exist_ok=True)
+    curves = reports_dir / "train_curves.png"
     save_curves(history, curves)
     summary = {
         "architecture": train_config["architecture"],
         "freeze_backbone": train_config["freeze_backbone"],
         "pretrained": train_config["pretrained"],
         "device": str(device),
+        "crop": dataset_config.get("crop", "wheat"),
         "classes": names,
         "train_size": len(train_set),
         "val_size": len(val_set),
@@ -222,16 +252,17 @@ def main(argv: list[str] | None = None) -> int:
         "best_epoch": best_epoch,
         "best_val_accuracy": round(best_acc, 4),
         "epochs_ran": len(history),
-        "checkpoint": relative_to_root(STAGE4_CHECKPOINT),
+        "checkpoint": relative_to_root(checkpoint_path),
+        "init_from": str(init_from) if init_from else None,
         "history": history,
     }
-    (STAGE4_REPORTS_DIR / "train_summary.json").write_text(
+    (reports_dir / "train_summary.json").write_text(
         json.dumps(summary, ensure_ascii=False, indent=2), encoding="utf-8"
     )
 
     print(f"\nЛучшая val accuracy: {best_acc:.3f} (эпоха {best_epoch})")
-    print(f"Веса: {relative_to_root(STAGE4_CHECKPOINT)}")
-    print(f"Сводка: {relative_to_root(STAGE4_REPORTS_DIR / 'train_summary.json')}")
+    print(f"Веса: {relative_to_root(checkpoint_path)}")
+    print(f"Сводка: {relative_to_root(reports_dir / 'train_summary.json')}")
     print(f"Графики: {relative_to_root(curves)}")
     print("Тестовая выборка на этом этапе не использовалась.")
     return 0

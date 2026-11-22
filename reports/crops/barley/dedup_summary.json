@@ -1,0 +1,512 @@
+{
+  "input_ok_images": 2352,
+  "removed_total": 125,
+  "removed_exact": 0,
+  "removed_near": 125,
+  "exact_groups": 0,
+  "near_groups": 50,
+  "phash_hamming_threshold": 4,
+  "scene_group_hamming_threshold": 12,
+  "clean_images": 2227,
+  "clean_per_class": {
+    "brown_rust": 344,
+    "healthy": 1451,
+    "ramularia": 432
+  },
+  "scene_groups_total": 1145,
+  "scene_groups_with_multiple_images": 69,
+  "label_conflicts": [
+    {
+      "path": "data/raw/barley/extracted/healthy/694003/00835.jpg",
+      "class_name": "healthy",
+      "duplicate_of": "data/raw/barley/extracted/brown_rust/9648/02321.jpg",
+      "duplicate_class": "brown_rust"
+    },
+    {
+      "path": "data/raw/barley/extracted/healthy/694007/01084.jpg",
+      "class_name": "healthy",
+      "duplicate_of": "data/raw/barley/extracted/brown_rust/9648/02321.jpg",
+      "duplicate_class": "brown_rust"
+    },
+    {
+      "path": "data/raw/barley/extracted/healthy/694007/01107.jpg",
+      "class_name": "healthy",
+      "duplicate_of": "data/raw/barley/extracted/brown_rust/9648/02321.jpg",
+      "duplicate_class": "brown_rust"
+    },
+    {
+      "path": "data/raw/barley/extracted/healthy/694007/01120.jpg",
+      "class_name": "healthy",
+      "duplicate_of": "data/raw/barley/extracted/brown_rust/9648/02321.jpg",
+      "duplicate_class": "brown_rust"
+    },
+    {
+      "path": "data/raw/barley/extracted/healthy/694008/01558.jpg",
+      "class_name": "healthy",
+      "duplicate_of": "data/raw/barley/extracted/brown_rust/9648/02321.jpg",
+      "duplicate_class": "brown_rust"
+    },
+    {
+      "path": "data/raw/barley/extracted/healthy/694008/01572.jpg",
+      "class_name": "healthy",
+      "duplicate_of": "data/raw/barley/extracted/brown_rust/9648/02321.jpg",
+      "duplicate_class": "brown_rust"
+    },
+    {
+      "path": "data/raw/barley/extracted/healthy/694009/00857.jpg",
+      "class_name": "healthy",
+      "duplicate_of": "data/raw/barley/extracted/brown_rust/9648/02321.jpg",
+      "duplicate_class": "brown_rust"
+    },
+    {
+      "path": "data/raw/barley/extracted/healthy/694009/00862.jpg",
+      "class_name": "healthy",
+      "duplicate_of": "data/raw/barley/extracted/brown_rust/9648/02321.jpg",
+      "duplicate_class": "brown_rust"
+    },
+    {
+      "path": "data/raw/barley/extracted/healthy/694010/00681.jpg",
+      "class_name": "healthy",
+      "duplicate_of": "data/raw/barley/extracted/brown_rust/9648/02321.jpg",
+      "duplicate_class": "brown_rust"
+    },
+    {
+      "path": "data/raw/barley/extracted/healthy/694010/00695.jpg",
+      "class_name": "healthy",
+      "duplicate_of": "data/raw/barley/extracted/brown_rust/9648/02321.jpg",
+      "duplicate_class": "brown_rust"
+    },
+    {
+      "path": "data/raw/barley/extracted/healthy/694011/01900.jpg",
+      "class_name": "healthy",
+      "duplicate_of": "data/raw/barley/extracted/brown_rust/9648/02321.jpg",
+      "duplicate_class": "brown_rust"
+    },
+    {
+      "path": "data/raw/barley/extracted/healthy/694011/01903.jpg",
+      "class_name": "healthy",
+      "duplicate_of": "data/raw/barley/extracted/brown_rust/9648/02321.jpg",
+      "duplicate_class": "brown_rust"
+    },
+    {
+      "path": "data/raw/barley/extracted/healthy/694013/01360.jpg",
+      "class_name": "healthy",
+      "duplicate_of": "data/raw/barley/extracted/brown_rust/9648/02321.jpg",
+      "duplicate_class": "brown_rust"
+    },
+    {
+      "path": "data/raw/barley/extracted/healthy/694014/01183.jpg",
+      "class_name": "healthy",
+      "duplicate_of": "data/raw/barley/extracted/brown_rust/9648/02321.jpg",
+      "duplicate_class": "brown_rust"
+    },
+    {
+      "path": "data/raw/barley/extracted/healthy/694014/01208.jpg",
+      "class_name": "healthy",
+      "duplicate_of": "data/raw/barley/extracted/brown_rust/9648/02321.jpg",
+      "duplicate_class": "brown_rust"
+    },
+    {
+      "path": "data/raw/barley/extracted/healthy/694016/01955.jpg",
+      "class_name": "healthy",
+      "duplicate_of": "data/raw/barley/extracted/brown_rust/9648/02321.jpg",
+      "duplicate_class": "brown_rust"
+    },
+    {
+      "path": "data/raw/barley/extracted/healthy/694022/00616.jpg",
+      "class_name": "healthy",
+      "duplicate_of": "data/raw/barley/extracted/brown_rust/9648/02321.jpg",
+      "duplicate_class": "brown_rust"
+    },
+    {
+      "path": "data/raw/barley/extracted/healthy/694022/00661.jpg",
+      "class_name": "healthy",
+      "duplicate_of": "data/raw/barley/extracted/brown_rust/9648/02321.jpg",
+      "duplicate_class": "brown_rust"
+    },
+    {
+      "path": "data/raw/barley/extracted/healthy/694022/00670.jpg",
+      "class_name": "healthy",
+      "duplicate_of": "data/raw/barley/extracted/brown_rust/9648/02321.jpg",
+      "duplicate_class": "brown_rust"
+    },
+    {
+      "path": "data/raw/barley/extracted/healthy/694023/01811.jpg",
+      "class_name": "healthy",
+      "duplicate_of": "data/raw/barley/extracted/brown_rust/9648/02321.jpg",
+      "duplicate_class": "brown_rust"
+    },
+    {
+      "path": "data/raw/barley/extracted/healthy/694023/01817.jpg",
+      "class_name": "healthy",
+      "duplicate_of": "data/raw/barley/extracted/brown_rust/9648/02321.jpg",
+      "duplicate_class": "brown_rust"
+    },
+    {
+      "path": "data/raw/barley/extracted/healthy/694024/02145.jpg",
+      "class_name": "healthy",
+      "duplicate_of": "data/raw/barley/extracted/brown_rust/9648/02321.jpg",
+      "duplicate_class": "brown_rust"
+    },
+    {
+      "path": "data/raw/barley/extracted/healthy/694025/00311.jpg",
+      "class_name": "healthy",
+      "duplicate_of": "data/raw/barley/extracted/brown_rust/9648/02321.jpg",
+      "duplicate_class": "brown_rust"
+    },
+    {
+      "path": "data/raw/barley/extracted/healthy/694026/01262.jpg",
+      "class_name": "healthy",
+      "duplicate_of": "data/raw/barley/extracted/brown_rust/9648/02321.jpg",
+      "duplicate_class": "brown_rust"
+    },
+    {
+      "path": "data/raw/barley/extracted/healthy/694028/00593.jpg",
+      "class_name": "healthy",
+      "duplicate_of": "data/raw/barley/extracted/brown_rust/9648/02321.jpg",
+      "duplicate_class": "brown_rust"
+    },
+    {
+      "path": "data/raw/barley/extracted/healthy/694028/00596.jpg",
+      "class_name": "healthy",
+      "duplicate_of": "data/raw/barley/extracted/brown_rust/9648/02321.jpg",
+      "duplicate_class": "brown_rust"
+    },
+    {
+      "path": "data/raw/barley/extracted/healthy/694029/01840.jpg",
+      "class_name": "healthy",
+      "duplicate_of": "data/raw/barley/extracted/brown_rust/9648/02321.jpg",
+      "duplicate_class": "brown_rust"
+    },
+    {
+      "path": "data/raw/barley/extracted/healthy/694029/01845.jpg",
+      "class_name": "healthy",
+      "duplicate_of": "data/raw/barley/extracted/brown_rust/9648/02321.jpg",
+      "duplicate_class": "brown_rust"
+    },
+    {
+      "path": "data/raw/barley/extracted/healthy/694029/01878.jpg",
+      "class_name": "healthy",
+      "duplicate_of": "data/raw/barley/extracted/brown_rust/9648/02321.jpg",
+      "duplicate_class": "brown_rust"
+    },
+    {
+      "path": "data/raw/barley/extracted/healthy/694029/01888.jpg",
+      "class_name": "healthy",
+      "duplicate_of": "data/raw/barley/extracted/brown_rust/9648/02321.jpg",
+      "duplicate_class": "brown_rust"
+    },
+    {
+      "path": "data/raw/barley/extracted/healthy/694031/00796.jpg",
+      "class_name": "healthy",
+      "duplicate_of": "data/raw/barley/extracted/brown_rust/9648/02321.jpg",
+      "duplicate_class": "brown_rust"
+    },
+    {
+      "path": "data/raw/barley/extracted/healthy/694031/00806.jpg",
+      "class_name": "healthy",
+      "duplicate_of": "data/raw/barley/extracted/brown_rust/9648/02321.jpg",
+      "duplicate_class": "brown_rust"
+    },
+    {
+      "path": "data/raw/barley/extracted/healthy/694031/00808.jpg",
+      "class_name": "healthy",
+      "duplicate_of": "data/raw/barley/extracted/brown_rust/9648/02321.jpg",
+      "duplicate_class": "brown_rust"
+    },
+    {
+      "path": "data/raw/barley/extracted/healthy/694032/01466.jpg",
+      "class_name": "healthy",
+      "duplicate_of": "data/raw/barley/extracted/brown_rust/9648/02321.jpg",
+      "duplicate_class": "brown_rust"
+    },
+    {
+      "path": "data/raw/barley/extracted/healthy/694032/01472.jpg",
+      "class_name": "healthy",
+      "duplicate_of": "data/raw/barley/extracted/brown_rust/9648/02321.jpg",
+      "duplicate_class": "brown_rust"
+    },
+    {
+      "path": "data/raw/barley/extracted/healthy/9633/00447.jpg",
+      "class_name": "healthy",
+      "duplicate_of": "data/raw/barley/extracted/brown_rust/9648/02321.jpg",
+      "duplicate_class": "brown_rust"
+    },
+    {
+      "path": "data/raw/barley/extracted/healthy/9633/00459.jpg",
+      "class_name": "healthy",
+      "duplicate_of": "data/raw/barley/extracted/brown_rust/9648/02321.jpg",
+      "duplicate_class": "brown_rust"
+    },
+    {
+      "path": "data/raw/barley/extracted/healthy/9633/00460.jpg",
+      "class_name": "healthy",
+      "duplicate_of": "data/raw/barley/extracted/brown_rust/9648/02321.jpg",
+      "duplicate_class": "brown_rust"
+    },
+    {
+      "path": "data/raw/barley/extracted/healthy/9633/00479.jpg",
+      "class_name": "healthy",
+      "duplicate_of": "data/raw/barley/extracted/brown_rust/9648/02321.jpg",
+      "duplicate_class": "brown_rust"
+    },
+    {
+      "path": "data/raw/barley/extracted/healthy/9633/00505.jpg",
+      "class_name": "healthy",
+      "duplicate_of": "data/raw/barley/extracted/brown_rust/9648/02321.jpg",
+      "duplicate_class": "brown_rust"
+    },
+    {
+      "path": "data/raw/barley/extracted/healthy/9633/00511.jpg",
+      "class_name": "healthy",
+      "duplicate_of": "data/raw/barley/extracted/brown_rust/9648/02321.jpg",
+      "duplicate_class": "brown_rust"
+    },
+    {
+      "path": "data/raw/barley/extracted/healthy/9633/00529.jpg",
+      "class_name": "healthy",
+      "duplicate_of": "data/raw/barley/extracted/brown_rust/9648/02321.jpg",
+      "duplicate_class": "brown_rust"
+    },
+    {
+      "path": "data/raw/barley/extracted/healthy/9633/00538.jpg",
+      "class_name": "healthy",
+      "duplicate_of": "data/raw/barley/extracted/brown_rust/9648/02321.jpg",
+      "duplicate_class": "brown_rust"
+    },
+    {
+      "path": "data/raw/barley/extracted/healthy/9648/02208.jpg",
+      "class_name": "healthy",
+      "duplicate_of": "data/raw/barley/extracted/brown_rust/9648/02321.jpg",
+      "duplicate_class": "brown_rust"
+    },
+    {
+      "path": "data/raw/barley/extracted/healthy/9648/02227.jpg",
+      "class_name": "healthy",
+      "duplicate_of": "data/raw/barley/extracted/brown_rust/9648/02321.jpg",
+      "duplicate_class": "brown_rust"
+    },
+    {
+      "path": "data/raw/barley/extracted/healthy/9648/02238.jpg",
+      "class_name": "healthy",
+      "duplicate_of": "data/raw/barley/extracted/brown_rust/9648/02321.jpg",
+      "duplicate_class": "brown_rust"
+    },
+    {
+      "path": "data/raw/barley/extracted/healthy/9648/02257.jpg",
+      "class_name": "healthy",
+      "duplicate_of": "data/raw/barley/extracted/brown_rust/9648/02321.jpg",
+      "duplicate_class": "brown_rust"
+    },
+    {
+      "path": "data/raw/barley/extracted/healthy/9648/02268.jpg",
+      "class_name": "healthy",
+      "duplicate_of": "data/raw/barley/extracted/brown_rust/9648/02321.jpg",
+      "duplicate_class": "brown_rust"
+    },
+    {
+      "path": "data/raw/barley/extracted/healthy/9648/02311.jpg",
+      "class_name": "healthy",
+      "duplicate_of": "data/raw/barley/extracted/brown_rust/9648/02321.jpg",
+      "duplicate_class": "brown_rust"
+    },
+    {
+      "path": "data/raw/barley/extracted/healthy/9650/00155.jpg",
+      "class_name": "healthy",
+      "duplicate_of": "data/raw/barley/extracted/brown_rust/9648/02321.jpg",
+      "duplicate_class": "brown_rust"
+    },
+    {
+      "path": "data/raw/barley/extracted/healthy/9830/01627.jpg",
+      "class_name": "healthy",
+      "duplicate_of": "data/raw/barley/extracted/brown_rust/9648/02321.jpg",
+      "duplicate_class": "brown_rust"
+    },
+    {
+      "path": "data/raw/barley/extracted/healthy/9842/00964.jpg",
+      "class_name": "healthy",
+      "duplicate_of": "data/raw/barley/extracted/brown_rust/9648/02321.jpg",
+      "duplicate_class": "brown_rust"
+    },
+    {
+      "path": "data/raw/barley/extracted/healthy/9842/00990.jpg",
+      "class_name": "healthy",
+      "duplicate_of": "data/raw/barley/extracted/brown_rust/9648/02321.jpg",
+      "duplicate_class": "brown_rust"
+    },
+    {
+      "path": "data/raw/barley/extracted/healthy/9842/00999.jpg",
+      "class_name": "healthy",
+      "duplicate_of": "data/raw/barley/extracted/brown_rust/9648/02321.jpg",
+      "duplicate_class": "brown_rust"
+    },
+    {
+      "path": "data/raw/barley/extracted/healthy/9842/01046.jpg",
+      "class_name": "healthy",
+      "duplicate_of": "data/raw/barley/extracted/brown_rust/9648/02321.jpg",
+      "duplicate_class": "brown_rust"
+    },
+    {
+      "path": "data/raw/barley/extracted/healthy/694025/00308.jpg",
+      "class_name": "healthy",
+      "duplicate_of": "data/raw/barley/extracted/brown_rust/9650/00148.jpg",
+      "duplicate_class": "brown_rust"
+    },
+    {
+      "path": "data/raw/barley/extracted/healthy/9633/00562.jpg",
+      "class_name": "healthy",
+      "duplicate_of": "data/raw/barley/extracted/brown_rust/9650/00148.jpg",
+      "duplicate_class": "brown_rust"
+    },
+    {
+      "path": "data/raw/barley/extracted/healthy/694007/01058.jpg",
+      "class_name": "healthy",
+      "duplicate_of": "data/raw/barley/extracted/brown_rust/9650/00163.jpg",
+      "duplicate_class": "brown_rust"
+    },
+    {
+      "path": "data/raw/barley/extracted/healthy/694007/01100.jpg",
+      "class_name": "healthy",
+      "duplicate_of": "data/raw/barley/extracted/brown_rust/9650/00163.jpg",
+      "duplicate_class": "brown_rust"
+    },
+    {
+      "path": "data/raw/barley/extracted/healthy/694024/02139.jpg",
+      "class_name": "healthy",
+      "duplicate_of": "data/raw/barley/extracted/brown_rust/9650/00163.jpg",
+      "duplicate_class": "brown_rust"
+    },
+    {
+      "path": "data/raw/barley/extracted/healthy/9633/00502.jpg",
+      "class_name": "healthy",
+      "duplicate_of": "data/raw/barley/extracted/brown_rust/9650/00163.jpg",
+      "duplicate_class": "brown_rust"
+    },
+    {
+      "path": "data/raw/barley/extracted/healthy/9648/02193.jpg",
+      "class_name": "healthy",
+      "duplicate_of": "data/raw/barley/extracted/brown_rust/9650/00163.jpg",
+      "duplicate_class": "brown_rust"
+    },
+    {
+      "path": "data/raw/barley/extracted/healthy/9648/02217.jpg",
+      "class_name": "healthy",
+      "duplicate_of": "data/raw/barley/extracted/brown_rust/9650/00163.jpg",
+      "duplicate_class": "brown_rust"
+    },
+    {
+      "path": "data/raw/barley/extracted/healthy/9633/00450.jpg",
+      "class_name": "healthy",
+      "duplicate_of": "data/raw/barley/extracted/brown_rust/9650/00164.jpg",
+      "duplicate_class": "brown_rust"
+    },
+    {
+      "path": "data/raw/barley/extracted/healthy/694031/00783.jpg",
+      "class_name": "healthy",
+      "duplicate_of": "data/raw/barley/extracted/brown_rust/9650/00174.jpg",
+      "duplicate_class": "brown_rust"
+    },
+    {
+      "path": "data/raw/barley/extracted/healthy/694026/01244.jpg",
+      "class_name": "healthy",
+      "duplicate_of": "data/raw/barley/extracted/brown_rust/9830/01601.jpg",
+      "duplicate_class": "brown_rust"
+    },
+    {
+      "path": "data/raw/barley/extracted/healthy/694036/00052.jpg",
+      "class_name": "healthy",
+      "duplicate_of": "data/raw/barley/extracted/brown_rust/9830/01601.jpg",
+      "duplicate_class": "brown_rust"
+    },
+    {
+      "path": "data/raw/barley/extracted/healthy/9633/00468.jpg",
+      "class_name": "healthy",
+      "duplicate_of": "data/raw/barley/extracted/brown_rust/9830/01601.jpg",
+      "duplicate_class": "brown_rust"
+    },
+    {
+      "path": "data/raw/barley/extracted/healthy/9648/02310.jpg",
+      "class_name": "healthy",
+      "duplicate_of": "data/raw/barley/extracted/brown_rust/9830/01601.jpg",
+      "duplicate_class": "brown_rust"
+    },
+    {
+      "path": "data/raw/barley/extracted/healthy/9842/01020.jpg",
+      "class_name": "healthy",
+      "duplicate_of": "data/raw/barley/extracted/brown_rust/9830/01638.jpg",
+      "duplicate_class": "brown_rust"
+    },
+    {
+      "path": "data/raw/barley/extracted/healthy/9633/00421.jpg",
+      "class_name": "healthy",
+      "duplicate_of": "data/raw/barley/extracted/brown_rust/9830/01692.jpg",
+      "duplicate_class": "brown_rust"
+    },
+    {
+      "path": "data/raw/barley/extracted/ramularia/41424/00375.jpg",
+      "class_name": "ramularia",
+      "duplicate_of": "data/raw/barley/extracted/healthy/694003/00833.jpg",
+      "duplicate_class": "healthy"
+    },
+    {
+      "path": "data/raw/barley/extracted/ramularia/694009/00881.jpg",
+      "class_name": "ramularia",
+      "duplicate_of": "data/raw/barley/extracted/healthy/694025/00326.jpg",
+      "duplicate_class": "healthy"
+    },
+    {
+      "path": "data/raw/barley/extracted/ramularia/41611/01411.jpg",
+      "class_name": "ramularia",
+      "duplicate_of": "data/raw/barley/extracted/healthy/694026/01226.jpg",
+      "duplicate_class": "healthy"
+    },
+    {
+      "path": "data/raw/barley/extracted/ramularia/694007/01114.jpg",
+      "class_name": "ramularia",
+      "duplicate_of": "data/raw/barley/extracted/healthy/694032/01441.jpg",
+      "duplicate_class": "healthy"
+    },
+    {
+      "path": "data/raw/barley/extracted/ramularia/694004/00023.jpg",
+      "class_name": "ramularia",
+      "duplicate_of": "data/raw/barley/extracted/healthy/694036/00087.jpg",
+      "duplicate_class": "healthy"
+    },
+    {
+      "path": "data/raw/barley/extracted/ramularia/41424/00369.jpg",
+      "class_name": "ramularia",
+      "duplicate_of": "data/raw/barley/extracted/healthy/694036/00091.jpg",
+      "duplicate_class": "healthy"
+    },
+    {
+      "path": "data/raw/barley/extracted/ramularia/41611/01423.jpg",
+      "class_name": "ramularia",
+      "duplicate_of": "data/raw/barley/extracted/healthy/9633/00436.jpg",
+      "duplicate_class": "healthy"
+    },
+    {
+      "path": "data/raw/barley/extracted/ramularia/694030/01515.jpg",
+      "class_name": "ramularia",
+      "duplicate_of": "data/raw/barley/extracted/healthy/9648/02194.jpg",
+      "duplicate_class": "healthy"
+    },
+    {
+      "path": "data/raw/barley/extracted/ramularia/9799/02006.jpg",
+      "class_name": "ramularia",
+      "duplicate_of": "data/raw/barley/extracted/healthy/9648/02194.jpg",
+      "duplicate_class": "healthy"
+    },
+    {
+      "path": "data/raw/barley/extracted/ramularia/694009/00865.jpg",
+      "class_name": "ramularia",
+      "duplicate_of": "data/raw/barley/extracted/healthy/9650/00265.jpg",
+      "duplicate_class": "healthy"
+    },
+    {
+      "path": "data/raw/barley/extracted/ramularia/41424/00374.jpg",
+      "class_name": "ramularia",
+      "duplicate_of": "data/raw/barley/extracted/healthy/9842/00945.jpg",
+      "duplicate_class": "healthy"
+    }
+  ]
+}

@@ -23,7 +23,8 @@ def file_md5(path: Path, chunk_size: int = CHUNK) -> str:
 
 def download(url: str, target: Path) -> None:
     print(f"Загрузка: {url}")
-    with urllib.request.urlopen(url) as response, target.open("wb") as out:
+    request = urllib.request.Request(url, headers={"User-Agent": "Mozilla/5.0"})
+    with urllib.request.urlopen(request) as response, target.open("wb") as out:
         total = int(response.headers.get("Content-Length", 0))
         done = 0
         while block := response.read(CHUNK):

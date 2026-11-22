@@ -1,0 +1,72 @@
+{
+  "architecture": "mobilenet_v3_small",
+  "freeze_backbone": true,
+  "pretrained": true,
+  "device": "mps",
+  "crop": "barley",
+  "classes": [
+    "healthy",
+    "brown_rust",
+    "ramularia"
+  ],
+  "train_size": 1548,
+  "val_size": 366,
+  "trainable_parameters": 593923,
+  "total_parameters": 1520931,
+  "best_epoch": 2,
+  "best_val_accuracy": 0.6858,
+  "epochs_ran": 7,
+  "checkpoint": "models/barley.pt",
+  "init_from": "models/stage4.pt",
+  "history": [
+    {
+      "epoch": 1,
+      "train_loss": 0.788,
+      "train_acc": 0.6796,
+      "val_loss": 0.9432,
+      "val_acc": 0.6475
+    },
+    {
+      "epoch": 2,
+      "train_loss": 0.5759,
+      "train_acc": 0.8017,
+      "val_loss": 0.8308,
+      "val_acc": 0.6858
+    },
+    {
+      "epoch": 3,
+      "train_loss": 0.5257,
+      "train_acc": 0.7991,
+      "val_loss": 1.0148,
+      "val_acc": 0.6366
+    },
+    {
+      "epoch": 4,
+      "train_loss": 0.4971,
+      "train_acc": 0.7972,
+      "val_loss": 1.45,
+      "val_acc": 0.6011
+    },
+    {
+      "epoch": 5,
+      "train_loss": 0.4672,
+      "train_acc": 0.8185,
+      "val_loss": 1.2922,
+      "val_acc": 0.6148
+    },
+    {
+      "epoch": 6,
+      "train_loss": 0.4183,
+      "train_acc": 0.8482,
+      "val_loss": 1.1892,
+      "val_acc": 0.582
+    },
+    {
+      "epoch": 7,
+      "train_loss": 0.4377,
+      "train_acc": 0.8372,
+      "val_loss": 1.337,
+      "val_acc": 0.5628
+    }
+  ]
+}

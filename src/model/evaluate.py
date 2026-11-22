@@ -219,13 +219,14 @@ def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(description="Измерить качество модели на фиксированной выборке.")
     parser.add_argument("--weights", type=Path, default=STAGE4_CHECKPOINT)
     parser.add_argument("--split", choices=("train", "val", "test"), default="test")
+    parser.add_argument("--split-csv", type=Path, default=None)
     parser.add_argument("--out-dir", type=Path, default=STAGE5_REPORTS_DIR)
     parser.add_argument("--bootstrap", type=int, default=1000, help="число повторов bootstrap")
     parser.add_argument("--seed", type=int, default=42)
     args = parser.parse_args(argv)
 
     ensure_dirs()
-    csv_path = SPLITS_DIR / f"{args.split}.csv"
+    csv_path = args.split_csv or (SPLITS_DIR / f"{args.split}.csv")
     if not csv_path.exists():
         print(f"Нет {csv_path}. Сначала: python -m src.data.split")
         return 1

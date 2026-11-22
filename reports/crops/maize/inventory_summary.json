@@ -1,0 +1,70 @@
+{
+  "root": "data/raw/maize/extracted",
+  "files_indexed": 1996,
+  "declared_image_count": 1996,
+  "ok": 1996,
+  "rejected": 0,
+  "reject_reasons": {},
+  "classes_declared": [
+    "blight",
+    "fall_armyworm",
+    "gray_spot",
+    "healthy"
+  ],
+  "classes_found": [
+    "blight",
+    "fall_armyworm",
+    "gray_spot",
+    "healthy"
+  ],
+  "classes_missing": [],
+  "unmapped_labels": {},
+  "per_class": {
+    "blight": {
+      "total": 489,
+      "ok": 489,
+      "rejected": 0
+    },
+    "fall_armyworm": {
+      "total": 525,
+      "ok": 525,
+      "rejected": 0
+    },
+    "gray_spot": {
+      "total": 555,
+      "ok": 555,
+      "rejected": 0
+    },
+    "healthy": {
+      "total": 427,
+      "ok": 427,
+      "rejected": 0
+    }
+  },
+  "label_source_to_class": {
+    "Fall_Armyworm": [
+      "fall_armyworm"
+    ],
+    "Gray_Spot": [
+      "gray_spot"
+    ],
+    "Healthy": [
+      "healthy"
+    ],
+    "Leaf_Blight": [
+      "blight"
+    ]
+  },
+  "resolution": {
+    "width_min": 256,
+    "width_max": 256,
+    "height_min": 192,
+    "height_max": 256
+  },
+  "modes": {
+    "RGB": 1996
+  },
+  "formats": {
+    "JPEG": 1996
+  }
+}

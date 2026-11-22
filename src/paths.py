@@ -28,6 +28,28 @@ UPLOADS_DIR = DATA_DIR / "uploads"
 
 MODELS_DIR = PROJECT_ROOT / "models"
 STAGE4_CHECKPOINT = MODELS_DIR / "stage4.pt"
+BARLEY_CHECKPOINT = MODELS_DIR / "barley.pt"
+MAIZE_CHECKPOINT = MODELS_DIR / "maize.pt"
+CROP_CHECKPOINTS = {
+    "wheat": STAGE4_CHECKPOINT,
+    "barley": BARLEY_CHECKPOINT,
+    "maize": MAIZE_CHECKPOINT,
+}
+CROP_DATASET_CONFIGS = {
+    "wheat": DATASET_CONFIG,
+    "barley": CONFIGS_DIR / "dataset_barley.yaml",
+    "maize": CONFIGS_DIR / "dataset_maize.yaml",
+}
+CROP_TITLES = {
+    "wheat": "Пшеница",
+    "barley": "Ячмень",
+    "maize": "Кукуруза",
+}
+CROP_GENITIVE = {
+    "wheat": "пшеницы",
+    "barley": "ячменя",
+    "maize": "кукурузы",
+}
 
 REPORTS_DIR = PROJECT_ROOT / "reports"
 STAGE2_REPORTS_DIR = REPORTS_DIR / "stage2"
@@ -57,6 +79,28 @@ def load_train_config(path: Path | None = None) -> dict[str, Any]:
 
 def load_control_config(path: Path | None = None) -> dict[str, Any]:
     return load_yaml(path or CONTROL_CONFIG)
+
+
+def resolve_data_paths(config: dict[str, Any] | None = None) -> dict[str, Path]:
+    custom = (config or {}).get("paths") or {}
+    defaults = {
+        "raw_images": "data/raw/extracted",
+        "inventory_csv": "data/interim/inventory.csv",
+        "duplicates_csv": "data/interim/duplicates.csv",
+        "clean_csv": "data/interim/clean.csv",
+        "splits_dir": "data/processed/splits",
+        "reports_dir": "reports/stage3",
+    }
+    resolved: dict[str, Path] = {}
+    for key, default in defaults.items():
+        value = custom.get(key, default)
+        path = PROJECT_ROOT / value
+        resolved[key] = path
+        if key.endswith("_dir") or key == "raw_images":
+            path.mkdir(parents=True, exist_ok=True)
+        else:
+            path.parent.mkdir(parents=True, exist_ok=True)
+    return resolved
 
 
 def ensure_dirs() -> None:

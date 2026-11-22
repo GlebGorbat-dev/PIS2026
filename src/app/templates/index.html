@@ -12,9 +12,20 @@
   <header>
     <h1>Детектирование заболеваний зерновых растений</h1>
     <p class="lead">
-      Загрузите фотографию листа или растения пшеницы. Программа определит
-      состояние растения: здоровое или одно из четырёх заболеваний.
+      Выберите культуру и загрузите фотографию листа. Программа определит
+      состояние растения: здоровое или одно из заболеваний {{ crop_genitive }}.
     </p>
+    <form class="crop-picker" action="/crop" method="post">
+      <fieldset>
+        <legend>Культура</legend>
+        {% for item in crops %}
+          <label>
+            <input type="radio" name="crop" value="{{ item.id }}" {% if item.selected %}checked{% endif %} onchange="this.form.submit()">
+            {{ item.ru }}
+          </label>
+        {% endfor %}
+      </fieldset>
+    </form>
   </header>
 
   {% if error %}
@@ -89,6 +100,7 @@
 
       <div class="actions">
         <form action="/predict" method="post">
+          <input type="hidden" name="crop" value="{{ crop }}">
           <button type="submit" class="primary" data-busy="Определяю…">{% if result %}Определить ещё раз{% else %}Определить заболевание{% endif %}</button>
         </form>
         <form action="/reset" method="post">
@@ -100,6 +112,7 @@
     <section class="upload">
       <h2>Проверить другую фотографию</h2>
       <form action="/upload" method="post" enctype="multipart/form-data">
+        <input type="hidden" name="crop" value="{{ crop }}">
         <input type="file" name="photo" accept="image/*" required>
         <button type="submit" class="primary" name="then" value="predict" data-busy="Определяю…">Заменить и определить</button>
         <button type="submit" class="ghost" data-busy="Загружаю…">Только заменить</button>
@@ -109,6 +122,7 @@
     <section class="upload empty">
       <h2>Выберите изображение</h2>
       <form action="/upload" method="post" enctype="multipart/form-data">
+        <input type="hidden" name="crop" value="{{ crop }}">
         <input type="file" name="photo" accept="image/*" required>
         <button type="submit" class="primary" name="then" value="predict" data-busy="Определяю…">Определить заболевание</button>
         <button type="submit" class="ghost" data-busy="Загружаю…">Только загрузить</button>
@@ -120,7 +134,7 @@
   {% endif %}
 
   <section class="classes">
-    <h2>Распознаваемые состояния</h2>
+    <h2>Распознаваемые состояния: {{ crop_title|lower }}</h2>
     <ul>
       {% for key, meta in classes.items() %}
         <li><code>{{ key }}</code> — {{ meta.ru }}</li>
@@ -129,7 +143,7 @@
   </section>
 
   <footer>
-    <p>MVP, версия {{ version }}. Изображения для обучения — Long et al., 2023, CC-BY-4.0.</p>
+    <p>MVP, версия {{ version }}. Пшеница — Long et al., 2023; ячмень — Martello et al., 2026; кукуруза — Ahmed, 2026. CC-BY-4.0.</p>
   </footer>
 </main>
 </body>

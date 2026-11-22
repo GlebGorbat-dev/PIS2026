@@ -14,6 +14,7 @@ from src.paths import (
     ensure_dirs,
     load_dataset_config,
     relative_to_root,
+    resolve_data_paths,
 )
 
 SPLIT_NAMES = ("train", "val", "test")
@@ -50,9 +51,12 @@ def split_frame(clean: pd.DataFrame, config: dict) -> pd.DataFrame:
 
     seed = int(split_config["random_seed"])
     use_groups = bool(split_config.get("group_near_duplicates", True))
+    group_by_parent = bool(split_config.get("group_by_parent_dir", False))
 
     result = clean.copy()
-    if not use_groups:
+    if group_by_parent:
+        result["scene_group"] = result["path"].map(lambda p: str(Path(p).parent))
+    elif not use_groups:
         result["scene_group"] = range(len(result))
 
     result["split"] = ""
@@ -73,24 +77,31 @@ def split_frame(clean: pd.DataFrame, config: dict) -> pd.DataFrame:
 
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(description="Разбить датасет на 3 выборки.")
-    parser.add_argument("--clean", type=Path, default=CLEAN_CSV, help="путь к clean.csv")
+    parser.add_argument("--config", type=Path, default=None)
+    parser.add_argument("--clean", type=Path, default=None, help="путь к clean.csv")
     args = parser.parse_args(argv)
 
-    if not args.clean.exists():
-        print(f"Нет {args.clean}. Сначала: python -m src.data.dedup")
+    ensure_dirs()
+    config = load_dataset_config(args.config)
+    data_paths = resolve_data_paths(config)
+    clean_path = args.clean or (data_paths["clean_csv"] if args.config else CLEAN_CSV)
+    splits_dir = data_paths["splits_dir"] if args.config else SPLITS_DIR
+    reports_dir = data_paths["reports_dir"] if args.config else STAGE3_REPORTS_DIR
+
+    if not clean_path.exists():
+        print(f"Нет {clean_path}. Сначала: python -m src.data.dedup")
         return 1
 
-    ensure_dirs()
-    config = load_dataset_config()
-    clean = pd.read_csv(args.clean)
+    clean = pd.read_csv(clean_path)
 
     result = split_frame(clean, config)
 
     columns = ["path", "class_name", "split", "scene_group", "width", "height", "md5", "dhash"]
+    splits_dir.mkdir(parents=True, exist_ok=True)
     for name in SPLIT_NAMES:
         subset = result.loc[result["split"] == name, columns].sort_values("path")
-        subset.to_csv(SPLITS_DIR / f"{name}.csv", index=False)
-    result[columns].sort_values("path").to_csv(SPLITS_DIR / "all.csv", index=False)
+        subset.to_csv(splits_dir / f"{name}.csv", index=False)
+    result[columns].sort_values("path").to_csv(splits_dir / "all.csv", index=False)
 
     counts = pd.crosstab(result["class_name"], result["split"])
     counts = counts.reindex(columns=list(SPLIT_NAMES), fill_value=0).sort_index()
@@ -130,7 +141,8 @@ def main(argv: list[str] | None = None) -> int:
             for name in SPLIT_NAMES
         },
     }
-    report_path = STAGE3_REPORTS_DIR / "split_summary.json"
+    reports_dir.mkdir(parents=True, exist_ok=True)
+    report_path = reports_dir / "split_summary.json"
     report_path.write_text(json.dumps(summary, ensure_ascii=False, indent=2), encoding="utf-8")
 
     print(f"Всего изображений: {summary['clean_images']}")
@@ -142,7 +154,7 @@ def main(argv: list[str] | None = None) -> int:
     empty = {k: v for k, v in summary["classes_missing_in_split"].items() if v}
     if empty:
         print(f"\nВНИМАНИЕ: в выборках не хватает классов: {empty}")
-    print(f"\nВыборки: {relative_to_root(SPLITS_DIR)}")
+    print(f"\nВыборки: {relative_to_root(splits_dir)}")
     print(f"Сводка:  {relative_to_root(report_path)}")
     return 0
 

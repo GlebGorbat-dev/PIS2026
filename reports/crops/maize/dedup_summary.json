@@ -1,0 +1,39 @@
+{
+  "input_ok_images": 1996,
+  "removed_total": 81,
+  "removed_exact": 63,
+  "removed_near": 18,
+  "exact_groups": 61,
+  "near_groups": 16,
+  "phash_hamming_threshold": 4,
+  "scene_group_hamming_threshold": 12,
+  "clean_images": 1915,
+  "clean_per_class": {
+    "blight": 487,
+    "fall_armyworm": 523,
+    "gray_spot": 547,
+    "healthy": 358
+  },
+  "scene_groups_total": 1365,
+  "scene_groups_with_multiple_images": 108,
+  "label_conflicts": [
+    {
+      "path": "data/raw/maize/extracted/Maize dataset/Leaf_Blight/Leaf_Blight_119.JPG",
+      "class_name": "blight",
+      "duplicate_of": "data/raw/maize/extracted/Maize dataset/Fall_Armyworm/Fall_Armyworm_25.JPG",
+      "duplicate_class": "fall_armyworm"
+    },
+    {
+      "path": "data/raw/maize/extracted/Maize dataset/Healthy/Healthy_262.JPG",
+      "class_name": "healthy",
+      "duplicate_of": "data/raw/maize/extracted/Maize dataset/Gray_Spot/Gray_Spot_415.JPG",
+      "duplicate_class": "gray_spot"
+    },
+    {
+      "path": "data/raw/maize/extracted/Maize dataset/Healthy/Healthy_178.JPG",
+      "class_name": "healthy",
+      "duplicate_of": "data/raw/maize/extracted/Maize dataset/Gray_Spot/Gray_Spot_500.JPG",
+      "duplicate_class": "gray_spot"
+    }
+  ]
+}

@@ -143,6 +143,61 @@ def test_real_model_answers_through_the_page(client):
 
 @needs_weights
 @pytest.mark.skipif(not (RAW_IMAGES_DIR / "YellowRust1010.png").exists(), reason="датасет не скачан")
+def test_crop_switch_shows_maize_classes(client):
+    page = client.post("/crop", data={"crop": "maize"}, follow_redirects=True)
+    assert page.status_code == 200
+    assert "Серая пятнистость" in page.text
+    assert "Повреждение совкой" in page.text
+    assert "Распознаваемые состояния: кукуруза" in page.text
+    assert "Септориоз" not in page.text
+
+
+def test_maize_predict_uses_maize_labels(client, monkeypatch):
+    prediction = Prediction(
+        "gray_spot",
+        "Серая пятнистость",
+        0.91,
+        {"healthy": 0.03, "blight": 0.04, "gray_spot": 0.91, "fall_armyworm": 0.02},
+    )
+    monkeypatch.setattr(main, "run_model", lambda path, **kwargs: prediction)
+    client.post("/crop", data={"crop": "maize"})
+    upload(client)
+    text = client.post("/predict", data={"crop": "maize"}).text
+    assert "Серая пятнистость" in text
+    assert "Уверенность модели: <strong>91%</strong>" in text
+    assert "Повреждение совкой" in text
+    assert "Жёлтая ржавчина" not in text
+
+
+def test_barley_predict_uses_barley_labels(client, monkeypatch):
+    prediction = Prediction(
+        "ramularia",
+        "Рамулярия",
+        0.77,
+        {"healthy": 0.10, "brown_rust": 0.13, "ramularia": 0.77},
+    )
+    monkeypatch.setattr(main, "run_model", lambda path, **kwargs: prediction)
+    client.post("/crop", data={"crop": "barley"})
+    upload(client)
+    text = client.post("/predict", data={"crop": "barley"}).text
+    assert "Рамулярия" in text
+    assert "Бурая ржавчина ячменя" in text
+    assert "Мучнистая роса" not in text
+
+
+def test_changing_crop_hides_previous_result(client, monkeypatch):
+    prediction = fake_prediction(
+        {"healthy": 0.02, "yellow_rust": 0.87, "brown_rust": 0.05, "septoria": 0.04, "mildew": 0.02}
+    )
+    monkeypatch.setattr(main, "run_model", lambda path, **kwargs: prediction)
+    upload(client)
+    assert "Жёлтая ржавчина" in client.post("/predict").text
+    page = client.post("/crop", data={"crop": "barley"}, follow_redirects=True)
+    assert "Результат распознавания" not in page.text
+    assert "Выбранное изображение" in page.text
+    assert "Распознаваемые состояния: ячмень" in page.text
+
+
 def test_real_model_recognises_dataset_photo(client):
     raw = (RAW_IMAGES_DIR / "YellowRust1010.png").read_bytes()
     client.post("/upload", files={"photo": ("YellowRust1010.png", raw, "image/png")})

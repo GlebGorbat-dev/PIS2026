@@ -1,0 +1,68 @@
+{
+  "clean_images": 1915,
+  "target_ratios": {
+    "train": 0.7,
+    "val": 0.15,
+    "test": 0.15
+  },
+  "random_seed": 42,
+  "group_near_duplicates": true,
+  "counts_per_split": {
+    "train": 1340,
+    "val": 288,
+    "test": 287
+  },
+  "actual_ratios": {
+    "train": 0.6997,
+    "val": 0.1504,
+    "test": 0.1499
+  },
+  "counts_per_class_split": {
+    "blight": {
+      "train": 341,
+      "val": 73,
+      "test": 73
+    },
+    "fall_armyworm": {
+      "train": 366,
+      "val": 79,
+      "test": 78
+    },
+    "gray_spot": {
+      "train": 383,
+      "val": 82,
+      "test": 82
+    },
+    "healthy": {
+      "train": 250,
+      "val": 54,
+      "test": 54
+    }
+  },
+  "class_share_per_split": {
+    "train": {
+      "blight": 0.2545,
+      "fall_armyworm": 0.2731,
+      "gray_spot": 0.2858,
+      "healthy": 0.1866
+    },
+    "val": {
+      "blight": 0.2535,
+      "fall_armyworm": 0.2743,
+      "gray_spot": 0.2847,
+      "healthy": 0.1875
+    },
+    "test": {
+      "blight": 0.2544,
+      "fall_armyworm": 0.2718,
+      "gray_spot": 0.2857,
+      "healthy": 0.1882
+    }
+  },
+  "scene_groups_leaked_across_splits": [],
+  "classes_missing_in_split": {
+    "train": [],
+    "val": [],
+    "test": []
+  }
+}

@@ -19,6 +19,7 @@ from src.paths import (
     ensure_dirs,
     load_dataset_config,
     relative_to_root,
+    resolve_data_paths,
 )
 
 Image.MAX_IMAGE_PIXELS = None
@@ -152,29 +153,35 @@ def scan(root: Path, config: dict) -> tuple[list[ImageRecord], Counter]:
 
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(description="Собрать инвентаризацию датасета.")
+    parser.add_argument("--config", type=Path, default=None)
     parser.add_argument(
         "--root",
         type=Path,
-        default=RAW_IMAGES_DIR,
+        default=None,
         help="каталог с распакованными изображениями",
     )
     args = parser.parse_args(argv)
 
-    if not args.root.exists():
-        print(f"Нет каталога {args.root}. Сначала выполните: python -m src.data.download")
+    ensure_dirs()
+    config = load_dataset_config(args.config)
+    data_paths = resolve_data_paths(config)
+    root = args.root or data_paths["raw_images"]
+    inventory_csv = data_paths["inventory_csv"] if args.config else INVENTORY_CSV
+    reports_dir = data_paths["reports_dir"] if args.config else STAGE3_REPORTS_DIR
+
+    if not root.exists():
+        print(f"Нет каталога {root}. Сначала выполните: python -m src.data.download")
         return 1
 
-    ensure_dirs()
-    config = load_dataset_config()
-
-    print(f"Сканирование {args.root}...")
-    records, unmapped = scan(args.root, config)
+    print(f"Сканирование {root}...")
+    records, unmapped = scan(root, config)
     if not records:
         print("Изображения не найдены — проверьте структуру архива.")
         return 1
 
     frame = pd.DataFrame([asdict(r) for r in records])
-    frame.to_csv(INVENTORY_CSV, index=False)
+    inventory_csv.parent.mkdir(parents=True, exist_ok=True)
+    frame.to_csv(inventory_csv, index=False)
 
     declared = set(config["classes"])
     found = set(frame["class_name"].unique())
@@ -191,7 +198,7 @@ def main(argv: list[str] | None = None) -> int:
     )
 
     summary = {
-        "root": relative_to_root(args.root),
+        "root": relative_to_root(root),
         "files_indexed": int(len(frame)),
         "declared_image_count": config["source"]["declared_image_count"],
         "ok": int((frame["status"] == "ok").sum()),
@@ -217,7 +224,8 @@ def main(argv: list[str] | None = None) -> int:
         "formats": frame.loc[frame["status"] == "ok", "image_format"].value_counts().to_dict(),
     }
 
-    report_path = STAGE3_REPORTS_DIR / "inventory_summary.json"
+    reports_dir.mkdir(parents=True, exist_ok=True)
+    report_path = reports_dir / "inventory_summary.json"
     report_path.write_text(
         json.dumps(summary, ensure_ascii=False, indent=2, default=str), encoding="utf-8"
     )
@@ -229,7 +237,7 @@ def main(argv: list[str] | None = None) -> int:
         print(f"\nВНИМАНИЕ: метки без класса (нужно решение вручную): {dict(unmapped)}")
     if missing:
         print(f"\nВНИМАНИЕ: в данных нет изображений для классов: {missing}")
-    print(f"\nИнвентаризация: {relative_to_root(INVENTORY_CSV)}")
+    print(f"\nИнвентаризация: {relative_to_root(inventory_csv)}")
     print(f"Сводка:          {relative_to_root(report_path)}")
     return 0
 
