@@ -16,6 +16,15 @@ def class_to_index(names: list[str]) -> dict[str, int]:
     return {name: index for index, name in enumerate(names)}
 
 
+def color_jitter_from_config(config: dict) -> transforms.ColorJitter:
+    jitter = config.get("color_jitter") or {}
+    return transforms.ColorJitter(
+        brightness=float(jitter.get("brightness", 0.15)),
+        contrast=float(jitter.get("contrast", 0.15)),
+        saturation=float(jitter.get("saturation", 0.1)),
+    )
+
+
 def build_transforms(config: dict, *, train: bool) -> transforms.Compose:
     size = int(config["image_size"])
     mean = list(config["imagenet_mean"])
@@ -25,7 +34,7 @@ def build_transforms(config: dict, *, train: bool) -> transforms.Compose:
             [
                 transforms.RandomResizedCrop(size, scale=(0.7, 1.0)),
                 transforms.RandomHorizontalFlip(),
-                transforms.ColorJitter(brightness=0.15, contrast=0.15, saturation=0.1),
+                color_jitter_from_config(config),
                 transforms.ToTensor(),
                 transforms.Normalize(mean, std),
             ]

@@ -1,0 +1,22 @@
+architecture: mobilenet_v3_small
+pretrained: true
+freeze_backbone: false
+image_size: 224
+batch_size: 32
+epochs: 20
+learning_rate: 0.0003
+backbone_learning_rate: 0.00005
+weight_decay: 0.0001
+num_workers: 0
+seed: 42
+early_stopping_patience: 5
+use_class_weights: true
+label_smoothing: 0.05
+selection_metric: val_macro_f1
+checkpoint: models/stage10.pt
+color_jitter:
+  brightness: 0.45
+  contrast: 0.30
+  saturation: 0.15
+imagenet_mean: [0.485, 0.456, 0.406]
+imagenet_std: [0.229, 0.224, 0.225]

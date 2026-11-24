@@ -27,7 +27,7 @@
 | 7 | [Проверка всех заявленных классов](docs/stages/stage7.md) | **выполнен** |
 | 8 | [Первый рабочий пользовательский сценарий (MVP)](docs/stages/stage8.md) | **выполнен** |
 | 9 | [Анализ ошибок модели](docs/stages/stage9.md) | **выполнен** |
-| 10 | Улучшенная версия модели | не начат |
+| 10 | [Улучшенная версия модели](docs/stages/stage10.md) | **выполнен** |
 
 ## Датасет
 
@@ -137,6 +137,18 @@ python -m src.control.run     # проверить все классы чере�
 python -m src.model.errors
 ```
 
+## Две модели на одном тесте
+
+Первая модель — `models/stage4.pt`, accuracy 0,711. Улучшенная — `models/stage10.pt`,
+accuracy 0,819 на том же `test.csv`. Программа по-прежнему отвечает весами
+первой модели. Сравнение и причина правок — в [`docs/stages/stage10.md`](docs/stages/stage10.md).
+
+```bash
+python -m src.model.train --config configs/train_stage10.yaml --reports-dir reports/stage10
+python -m src.model.evaluate --weights models/stage10.pt --out-dir reports/stage10/eval
+python -m src.model.compare --candidate reports/stage10/eval/predictions.csv --out reports/stage10/comparison.json
+```
+
 ## Подготовка данных
 
 ```bash
@@ -156,6 +168,7 @@ python -m src.data.preview     # собрать контактные листы 
 ```
 configs/dataset.yaml            источник данных, классы и их признаки, пороги, доли выборок
 configs/train.yaml              гиперпараметры первой модели
+configs/train_stage10.yaml      гиперпараметры улучшенной модели
 configs/control.yaml            параметры проверки классов
 src/paths.py                    пути проекта и чтение конфига
 src/data/                       загрузка, инвентаризация, дедупликация, разбиение
@@ -167,10 +180,12 @@ data/interim/                   инвентаризация, список ду�
 data/processed/splits/          train.csv, val.csv, test.csv, all.csv
 data/control/                   контрольный набор для каждого класса
 models/stage4.pt                веса первой модели
+models/stage10.pt               веса улучшенной модели
 reports/stage3/                 сводки по датасету, контактные листы
 reports/stage4/                 кривые обучения и сводка
 reports/stage5/                 метрики на test, предсказания, матрица ошибок
 reports/stage9/                 категории ошибок, признаки кадров, контактные листы
+reports/stage10/                обучение второй модели, метрики на test, сравнение
 reports/stage6/                 скриншоты сценария распознавания
 reports/stage7/                 проверка классов: итоги и контактные листы
 demos/                          записи экрана работы приложения

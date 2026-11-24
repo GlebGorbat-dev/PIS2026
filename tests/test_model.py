@@ -4,9 +4,33 @@ import torch
 from PIL import Image
 
 from src.model.architecture import build_model
-from src.model.dataset import LeafCsvDataset, build_transforms, open_rgb
+from src.model.dataset import LeafCsvDataset, build_transforms, color_jitter_from_config, open_rgb
+from src.model.train import build_optimizer
 from src.model.predict import load_checkpoint, predict
 from src.paths import load_train_config
+
+
+def test_default_color_jitter_stays_at_stage4_strength():
+    jitter = color_jitter_from_config(load_train_config())
+    assert jitter.brightness == (0.85, 1.15)
+
+
+def test_stage10_jitter_covers_darker_frames():
+    config = load_train_config()
+    config = {**config, "color_jitter": {"brightness": 0.45, "contrast": 0.3, "saturation": 0.15}}
+    jitter = color_jitter_from_config(config)
+    assert jitter.brightness[0] < 0.85
+    assert jitter.brightness == (0.55, 1.45)
+
+
+def test_backbone_gets_its_own_learning_rate():
+    model = build_model(3, pretrained=False, freeze_backbone=False)
+    optimizer = build_optimizer(
+        model,
+        {"learning_rate": 0.0003, "backbone_learning_rate": 0.00005, "weight_decay": 0.0001},
+    )
+    rates = sorted(group["lr"] for group in optimizer.param_groups)
+    assert rates == [0.00005, 0.0003]
 
 
 def test_open_rgb_drops_alpha_channel(tmp_path):

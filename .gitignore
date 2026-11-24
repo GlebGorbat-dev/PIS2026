@@ -25,6 +25,7 @@ models/*.pt
 models/*.pth
 models/*.onnx
 !models/stage4.pt
+!models/stage10.pt
 !models/barley.pt
 !models/maize.pt
 runs/

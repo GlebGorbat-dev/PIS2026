@@ -10,6 +10,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 import torch
+from sklearn.metrics import f1_score
 from torch import nn
 from torch.utils.data import DataLoader
 
@@ -49,12 +50,37 @@ def class_weights(train_csv: Path, names: list[str], device: torch.device) -> to
     return torch.tensor(values, dtype=torch.float32, device=device)
 
 
-def run_epoch(model, loader, criterion, optimizer, device) -> tuple[float, float]:
+def build_optimizer(model: nn.Module, config: dict) -> torch.optim.Optimizer:
+    head_lr = float(config["learning_rate"])
+    decay = float(config["weight_decay"])
+    backbone_lr = config.get("backbone_learning_rate")
+    features = getattr(model, "features", None)
+    backbone_trainable = features is not None and any(p.requires_grad for p in features.parameters())
+    if backbone_lr is None or not backbone_trainable:
+        return torch.optim.Adam(
+            (p for p in model.parameters() if p.requires_grad),
+            lr=head_lr,
+            weight_decay=decay,
+        )
+    head = [p for name, p in model.named_parameters() if p.requires_grad and not name.startswith("features.")]
+    backbone = [p for p in features.parameters() if p.requires_grad]
+    return torch.optim.Adam(
+        [
+            {"params": backbone, "lr": float(backbone_lr)},
+            {"params": head, "lr": head_lr},
+        ],
+        weight_decay=decay,
+    )
+
+
+def run_epoch(model, loader, criterion, optimizer, device, n_classes: int) -> tuple[float, float, float]:
     train = optimizer is not None
     model.train(train)
     total_loss = 0.0
     correct = 0
     seen = 0
+    true_labels: list[int] = []
+    pred_labels: list[int] = []
     context = torch.enable_grad() if train else torch.no_grad()
     with context:
         for inputs, labels in loader:
@@ -68,9 +94,15 @@ def run_epoch(model, loader, criterion, optimizer, device) -> tuple[float, float
                 loss.backward()
                 optimizer.step()
             total_loss += float(loss.item()) * labels.size(0)
-            correct += int((logits.argmax(dim=1) == labels).sum().item())
+            predicted = logits.argmax(dim=1)
+            correct += int((predicted == labels).sum().item())
             seen += labels.size(0)
-    return total_loss / max(seen, 1), correct / max(seen, 1)
+            true_labels.extend(int(value) for value in labels.detach().cpu().tolist())
+            pred_labels.extend(int(value) for value in predicted.detach().cpu().tolist())
+    macro_f1 = float(
+        f1_score(true_labels, pred_labels, labels=list(range(n_classes)), average="macro", zero_division=0)
+    )
+    return total_loss / max(seen, 1), correct / max(seen, 1), macro_f1
 
 
 def save_curves(history: list[dict], path: Path) -> None:
@@ -169,52 +201,63 @@ def main(argv: list[str] | None = None) -> int:
         transferred = transfer_backbone(model, init_path)
         print(f"Перенесён backbone из {relative_to_root(init_path)}: слоёв {transferred}")
 
+    smoothing = float(train_config.get("label_smoothing", 0.0))
     if train_config["use_class_weights"]:
         weights = class_weights(splits_dir / "train.csv", names, device)
         print(f"Веса классов: {dict(zip(names, [round(float(w), 3) for w in weights]))}")
-        criterion = nn.CrossEntropyLoss(weight=weights)
+        criterion = nn.CrossEntropyLoss(weight=weights, label_smoothing=smoothing)
     else:
-        criterion = nn.CrossEntropyLoss()
+        criterion = nn.CrossEntropyLoss(label_smoothing=smoothing)
 
-    optimizer = torch.optim.Adam(
-        (p for p in model.parameters() if p.requires_grad),
-        lr=float(train_config["learning_rate"]),
-        weight_decay=float(train_config["weight_decay"]),
-    )
+    optimizer = build_optimizer(model, train_config)
+    selection = str(train_config.get("selection_metric", "val_accuracy"))
+    print(f"Выбор чекпоинта: {selection}")
+    if train_config.get("backbone_learning_rate") is not None:
+        print(f"Learning rate головы: {train_config['learning_rate']}, backbone: {train_config['backbone_learning_rate']}")
 
     history: list[dict] = []
+    best_score = -1.0
     best_acc = -1.0
+    best_f1 = -1.0
     best_state = None
     best_epoch = 0
     patience = int(train_config["early_stopping_patience"])
     stale = 0
+    n_classes = len(names)
 
     epochs = int(train_config["epochs"])
     for epoch in range(1, epochs + 1):
-        train_loss, train_acc = run_epoch(model, train_loader, criterion, optimizer, device)
-        val_loss, val_acc = run_epoch(model, val_loader, criterion, None, device)
+        train_loss, train_acc, train_f1 = run_epoch(model, train_loader, criterion, optimizer, device, n_classes)
+        val_loss, val_acc, val_f1 = run_epoch(model, val_loader, criterion, None, device, n_classes)
         row = {
             "epoch": epoch,
             "train_loss": round(train_loss, 4),
             "train_acc": round(train_acc, 4),
+            "train_macro_f1": round(train_f1, 4),
             "val_loss": round(val_loss, 4),
             "val_acc": round(val_acc, 4),
+            "val_macro_f1": round(val_f1, 4),
         }
         history.append(row)
         print(
             f"Эпоха {epoch:02d}/{epochs}  "
-            f"train loss={train_loss:.3f} acc={train_acc:.3f}  "
-            f"val loss={val_loss:.3f} acc={val_acc:.3f}"
+            f"train loss={train_loss:.3f} acc={train_acc:.3f} f1={train_f1:.3f}  "
+            f"val loss={val_loss:.3f} acc={val_acc:.3f} f1={val_f1:.3f}"
         )
-        if val_acc > best_acc:
+        score = val_f1 if selection == "val_macro_f1" else val_acc
+        if score > best_score:
+            best_score = score
             best_acc = val_acc
+            best_f1 = val_f1
             best_epoch = epoch
             best_state = {k: v.detach().cpu().clone() for k, v in model.state_dict().items()}
             stale = 0
         else:
             stale += 1
             if stale >= patience:
-                print(f"Ранняя остановка на эпохе {epoch}, лучшая val acc={best_acc:.3f} (эпоха {best_epoch})")
+                print(
+                    f"Ранняя остановка на эпохе {epoch}, лучшая {selection}={best_score:.3f} (эпоха {best_epoch})"
+                )
                 break
 
     if best_state is None:
@@ -228,6 +271,8 @@ def main(argv: list[str] | None = None) -> int:
         "crop": dataset_config.get("crop", "wheat"),
         "config": train_config,
         "best_val_accuracy": best_acc,
+        "best_val_macro_f1": best_f1,
+        "selection_metric": selection,
         "best_epoch": best_epoch,
         "history": history,
         "architecture": train_config["architecture"],
@@ -250,7 +295,9 @@ def main(argv: list[str] | None = None) -> int:
         "trainable_parameters": trainable,
         "total_parameters": total,
         "best_epoch": best_epoch,
+        "selection_metric": selection,
         "best_val_accuracy": round(best_acc, 4),
+        "best_val_macro_f1": round(best_f1, 4),
         "epochs_ran": len(history),
         "checkpoint": relative_to_root(checkpoint_path),
         "init_from": str(init_from) if init_from else None,

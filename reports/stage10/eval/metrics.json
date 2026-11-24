@@ -1,0 +1,137 @@
+{
+  "split": "test",
+  "split_csv": "data/processed/splits/test.csv",
+  "split_csv_md5": "6558276dacea7a8cb19140543a2b71ea",
+  "weights": "models/stage10.pt",
+  "weights_md5": "d0236b8944ab232f514e2867d6370cfd",
+  "architecture": "mobilenet_v3_small",
+  "best_val_accuracy_at_training": 0.8255,
+  "device": "mps",
+  "classes": [
+    "healthy",
+    "yellow_rust",
+    "brown_rust",
+    "septoria",
+    "mildew"
+  ],
+  "images": 149,
+  "accuracy": 0.8188,
+  "balanced_accuracy": 0.775,
+  "top2_accuracy": 0.953,
+  "macro": {
+    "precision": 0.8152,
+    "recall": 0.775,
+    "f1": 0.7883
+  },
+  "weighted": {
+    "precision": 0.8202,
+    "recall": 0.8188,
+    "f1": 0.8139
+  },
+  "mAP": 0.8797,
+  "roc_auc_macro_ovr": 0.9636,
+  "log_loss": 0.5207,
+  "expected_calibration_error": 0.0474,
+  "mean_confidence_correct": 0.8252,
+  "mean_confidence_wrong": 0.6554,
+  "count_error": {
+    "mae_per_class": 4.0,
+    "misassigned_share": 0.0671
+  },
+  "per_class": {
+    "healthy": {
+      "precision": 0.8,
+      "recall": 0.6667,
+      "f1": 0.7273,
+      "average_precision": 0.8466,
+      "support": 18,
+      "predicted_count": 15,
+      "count_error": -3
+    },
+    "yellow_rust": {
+      "precision": 0.7778,
+      "recall": 0.9722,
+      "f1": 0.8642,
+      "average_precision": 0.8574,
+      "support": 36,
+      "predicted_count": 45,
+      "count_error": 9
+    },
+    "brown_rust": {
+      "precision": 0.7857,
+      "recall": 0.5789,
+      "f1": 0.6667,
+      "average_precision": 0.8923,
+      "support": 19,
+      "predicted_count": 14,
+      "count_error": -5
+    },
+    "septoria": {
+      "precision": 0.8491,
+      "recall": 0.8654,
+      "f1": 0.8571,
+      "average_precision": 0.9121,
+      "support": 52,
+      "predicted_count": 53,
+      "count_error": 1
+    },
+    "mildew": {
+      "precision": 0.8636,
+      "recall": 0.7917,
+      "f1": 0.8261,
+      "average_precision": 0.8901,
+      "support": 24,
+      "predicted_count": 22,
+      "count_error": -2
+    }
+  },
+  "confusion_matrix": [
+    [
+      12,
+      1,
+      1,
+      2,
+      2
+    ],
+    [
+      0,
+      35,
+      0,
+      1,
+      0
+    ],
+    [
+      3,
+      3,
+      11,
+      1,
+      1
+    ],
+    [
+      0,
+      5,
+      2,
+      45,
+      0
+    ],
+    [
+      0,
+      1,
+      0,
+      4,
+      19
+    ]
+  ],
+  "bootstrap": {
+    "rounds": 1000,
+    "seed": 42,
+    "accuracy_95ci": [
+      0.7517,
+      0.8792
+    ],
+    "macro_f1_95ci": [
+      0.7086,
+      0.8559
+    ]
+  }
+}

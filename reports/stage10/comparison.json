@@ -1,0 +1,79 @@
+{
+  "baseline_images": 149,
+  "candidate_images": 149,
+  "same_paths": true,
+  "baseline_accuracy": 0.7114,
+  "candidate_accuracy": 0.8188,
+  "baseline_errors": 43,
+  "candidate_errors": 27,
+  "recall": [
+    {
+      "class_name": "brown_rust",
+      "baseline": 0.4737,
+      "candidate": 0.5789
+    },
+    {
+      "class_name": "healthy",
+      "baseline": 0.6111,
+      "candidate": 0.6667
+    },
+    {
+      "class_name": "mildew",
+      "baseline": 0.875,
+      "candidate": 0.7917
+    },
+    {
+      "class_name": "septoria",
+      "baseline": 0.6154,
+      "candidate": 0.8654
+    },
+    {
+      "class_name": "yellow_rust",
+      "baseline": 0.9167,
+      "candidate": 0.9722
+    }
+  ],
+  "focus_pairs": [
+    {
+      "pair": "septoria -> yellow_rust",
+      "baseline": 14,
+      "candidate": 5,
+      "delta": -9
+    },
+    {
+      "pair": "brown_rust -> yellow_rust",
+      "baseline": 6,
+      "candidate": 3,
+      "delta": -3
+    },
+    {
+      "pair": "septoria -> brown_rust",
+      "baseline": 2,
+      "candidate": 2,
+      "delta": 0
+    },
+    {
+      "pair": "yellow_rust -> septoria",
+      "baseline": 2,
+      "candidate": 1,
+      "delta": -1
+    },
+    {
+      "pair": "brown_rust -> septoria",
+      "baseline": 1,
+      "candidate": 1,
+      "delta": 0
+    }
+  ],
+  "paired_accuracy": {
+    "fixed": 21,
+    "regressed": 5,
+    "delta": 0.1074,
+    "delta_95ci": [
+      0.047,
+      0.1678
+    ],
+    "rounds": 1000,
+    "seed": 42
+  }
+}
