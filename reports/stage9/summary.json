@@ -1,0 +1,143 @@
+{
+  "images": 149,
+  "errors": 43,
+  "accuracy": 0.7114,
+  "primary": [
+    {
+      "id": "similar_diseases",
+      "title": "Похожие заболевания",
+      "count": 25,
+      "share_of_errors": 0.5814
+    },
+    {
+      "id": "healthy_looks_like_disease",
+      "title": "Здоровый лист похож на болезнь",
+      "count": 7,
+      "share_of_errors": 0.1628
+    },
+    {
+      "id": "confused_with_mildew",
+      "title": "Принято за мучнистую росу",
+      "count": 4,
+      "share_of_errors": 0.093
+    },
+    {
+      "id": "called_healthy",
+      "title": "Болезнь принята за здоровый лист",
+      "count": 4,
+      "share_of_errors": 0.093
+    },
+    {
+      "id": "mildew_missed",
+      "title": "Мучнистая роса не распознана",
+      "count": 3,
+      "share_of_errors": 0.0698
+    }
+  ],
+  "pairs": [
+    {
+      "pair": "septoria -> yellow_rust",
+      "count": 14
+    },
+    {
+      "pair": "brown_rust -> yellow_rust",
+      "count": 6
+    },
+    {
+      "pair": "healthy -> mildew",
+      "count": 3
+    },
+    {
+      "pair": "septoria -> mildew",
+      "count": 3
+    },
+    {
+      "pair": "brown_rust -> healthy",
+      "count": 2
+    },
+    {
+      "pair": "healthy -> brown_rust",
+      "count": 2
+    },
+    {
+      "pair": "septoria -> brown_rust",
+      "count": 2
+    },
+    {
+      "pair": "yellow_rust -> septoria",
+      "count": 2
+    },
+    {
+      "pair": "brown_rust -> septoria",
+      "count": 1
+    },
+    {
+      "pair": "brown_rust -> mildew",
+      "count": 1
+    },
+    {
+      "pair": "healthy -> yellow_rust",
+      "count": 1
+    },
+    {
+      "pair": "healthy -> septoria",
+      "count": 1
+    },
+    {
+      "pair": "mildew -> septoria",
+      "count": 1
+    },
+    {
+      "pair": "mildew -> yellow_rust",
+      "count": 1
+    },
+    {
+      "pair": "mildew -> healthy",
+      "count": 1
+    },
+    {
+      "pair": "septoria -> healthy",
+      "count": 1
+    },
+    {
+      "pair": "yellow_rust -> healthy",
+      "count": 1
+    }
+  ],
+  "conditions": {
+    "poor_light": {
+      "title": "Плохое освещение",
+      "errors": 13,
+      "error_share": 0.3023,
+      "correct_share": 0.1415
+    },
+    "blur": {
+      "title": "Смазанный кадр",
+      "errors": 7,
+      "error_share": 0.1628,
+      "correct_share": 0.0943
+    },
+    "complex_background": {
+      "title": "Сложный фон",
+      "errors": 13,
+      "error_share": 0.3023,
+      "correct_share": 0.1981
+    },
+    "small_symptom": {
+      "title": "Симптом занимает малую часть кадра",
+      "errors": 16,
+      "error_share": 0.3721,
+      "correct_share": 0.5189
+    }
+  },
+  "true_class_in_top2": 0.6279,
+  "true_class_in_top2_count": 27,
+  "high_confidence_errors": 9,
+  "pot_fraction_median_by_class": {
+    "brown_rust": 0.0114,
+    "healthy": 0.0259,
+    "mildew": 0.0464,
+    "septoria": 0.0857,
+    "yellow_rust": 0.009
+  }
+}
