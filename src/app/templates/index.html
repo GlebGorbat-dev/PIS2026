@@ -4,29 +4,58 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Детектирование заболеваний зерновых растений</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Newsreader:opsz,wght@6..72,500;6..72,600;6..72,700&family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="{{ url_for('static', path='styles.css') }}">
   <script src="{{ url_for('static', path='app.js') }}" defer></script>
 </head>
 <body>
-<main>
-  <header>
-    <h1>Детектирование заболеваний зерновых растений</h1>
-    <p class="lead">
-      Выберите культуру и загрузите фотографию листа. Программа определит
-      состояние растения: здоровое или одно из заболеваний {{ crop_genitive }}.
-    </p>
-    <form class="crop-picker" action="/crop" method="post">
-      <fieldset>
-        <legend>Культура</legend>
-        {% for item in crops %}
-          <label>
-            <input type="radio" name="crop" value="{{ item.id }}" {% if item.selected %}checked{% endif %} onchange="this.form.submit()">
-            {{ item.ru }}
-          </label>
-        {% endfor %}
-      </fieldset>
-    </form>
+<a class="skip" href="#work">К работе со снимком</a>
+<div class="shell">
+  <header class="mast">
+    <div class="brand">
+      <span class="mark" aria-hidden="true">
+        <svg viewBox="0 0 48 48" width="48" height="48">
+          <rect width="48" height="48" rx="14" fill="#1f4d32"/>
+          <path d="M24 38V14" stroke="#f4e7c5" stroke-width="1.8" stroke-linecap="round"/>
+          <path d="M24 18c-4-1-7 1-8 4 3 .4 6-.2 8-2zM24 24c-5-.6-8 1.4-9 4.6 3.6.2 6.6-.6 9-2.4zM24 30c-4.2-.4-7 1.2-8 4 3.2.3 6-.4 8-2z" fill="#d7e7c8"/>
+          <path d="M24 16c4-.8 7 .8 8 3.6-3 .6-6 0-8-2zM24 23c5-.4 8 1.6 9 4.8-3.8.1-6.8-.8-9-2.6zM24 29c4.4-.2 7.2 1.4 8.2 4.2-3.4.2-6.2-.6-8.2-2.2z" fill="#f4e7c5"/>
+        </svg>
+      </span>
+      <div>
+        <p class="eyebrow">Полевая диагностика</p>
+        <h1>Детектирование заболеваний зерновых растений</h1>
+      </div>
+    </div>
+    <p class="version">MVP {{ version }}</p>
   </header>
+
+  <p class="lead">
+    Выберите культуру и загрузите фотографию листа. Программа определит
+    состояние растения: здоровое или одно из заболеваний {{ crop_genitive }}.
+  </p>
+
+  <form class="crop-picker" action="/crop" method="post">
+    <fieldset>
+      <legend>Культура</legend>
+      {% for item in crops %}
+        <label class="crop">
+          <input type="radio" name="crop" value="{{ item.id }}" {% if item.selected %}checked{% endif %} onchange="this.form.submit()">
+          <span class="crop-glyph" aria-hidden="true">
+            {% if item.id == "wheat" %}
+              <svg viewBox="0 0 32 32"><path d="M16 28V8M16 12c-3-.4-5 .6-6 2.6 2.2.2 4.2-.2 6-1.4M16 17c-3.4-.2-5.4 1-6.2 3 2.4.2 4.4-.2 6.2-1.4M16 22c-2.8-.2-4.6.8-5.4 2.4 2 .2 3.8-.2 5.4-1.2M16 11c3-.2 5 .8 6 2.6-2.2.4-4.2 0-6-1.2M16 16c3.4 0 5.6 1.2 6.4 3.2-2.4.2-4.6-.4-6.4-1.6M16 21c2.8 0 4.8 1 5.6 2.6-2 .1-4-.4-5.6-1.4" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            {% elif item.id == "barley" %}
+              <svg viewBox="0 0 32 32"><path d="M16 28V7M11 12l5-2 5 2M10 17l6-2 6 2M11 22l5-2 5 2M13 26l3-1.2L19 26" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            {% else %}
+              <svg viewBox="0 0 32 32"><path d="M16 27V8M12 12c1.2 2 2.4 3 4 3s2.8-1 4-3c-1.2 2.4-2.4 4-4 4s-2.8-1.6-4-4zM11.5 18c1.4 1.8 2.8 2.6 4.5 2.6s3.1-.8 4.5-2.6c-1.4 2.2-2.8 3.4-4.5 3.4s-3.1-1.2-4.5-3.4z" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            {% endif %}
+          </span>
+          <span>{{ item.ru }}</span>
+        </label>
+      {% endfor %}
+    </fieldset>
+  </form>
 
   {% if error %}
     <p class="message error" role="alert">{{ error }}</p>
@@ -35,10 +64,75 @@
     <p class="message notice" role="status">{{ notice }}</p>
   {% endif %}
 
-  {% if image %}
+  <div class="workspace" id="work">
+    {% if image %}
+      <section class="panel preview">
+        <div class="panel-head">
+          <h2>Выбранное изображение</h2>
+          <p class="file-name">{{ image.original_name }}</p>
+        </div>
+        <figure class="frame">
+          <img src="/image?v={{ image.token }}" alt="Загруженная фотография растения">
+        </figure>
+        <dl class="facts">
+          <div>
+            <dt>Формат</dt>
+            <dd>{{ image.image_format }}</dd>
+          </div>
+          <div>
+            <dt>Размер кадра</dt>
+            <dd>{{ image.width }} × {{ image.height }} px</dd>
+          </div>
+          <div>
+            <dt>Детализация</dt>
+            <dd>{{ '%.1f'|format(image.megapixels) }} Мп</dd>
+          </div>
+          <div>
+            <dt>Объём файла</dt>
+            <dd>{{ human_size(image.size_bytes) }}</dd>
+          </div>
+        </dl>
+        <div class="actions">
+          <form action="/predict" method="post">
+            <input type="hidden" name="crop" value="{{ crop }}">
+            <button type="submit" class="primary" data-busy="Определяю…">{% if result %}Определить ещё раз{% else %}Определить заболевание{% endif %}</button>
+          </form>
+          <form action="/reset" method="post">
+            <button type="submit" class="ghost">Убрать изображение</button>
+          </form>
+        </div>
+      </section>
+    {% else %}
+      <section class="panel upload empty">
+        <div class="drop">
+          <p class="eyebrow">Новый снимок</p>
+          <h2>Выберите изображение</h2>
+          <p class="drop-copy">Лист {{ crop_genitive }} целиком, при ровном свете, без сильного размытия.</p>
+          <form action="/upload" method="post" enctype="multipart/form-data">
+            <input type="hidden" name="crop" value="{{ crop }}">
+            <label class="file-pick">
+              <input type="file" name="photo" accept="image/*" required>
+              <span>Выбрать файл</span>
+            </label>
+            <span class="file-chosen" data-empty="Файл не выбран">Файл не выбран</span>
+            <div class="actions">
+              <button type="submit" class="primary" name="then" value="predict" data-busy="Определяю…">Определить заболевание</button>
+              <button type="submit" class="ghost" data-busy="Загружаю…">Только загрузить</button>
+            </div>
+          </form>
+          <p class="hint">
+            Форматы: {{ allowed_formats|join(', ') }}. Размер файла — до {{ max_upload_mb }} МБ.
+            Снимок нужен резкий, не слишком тёмный и не пересвеченный. Меньшая сторона — не меньше 64 px.
+            Ниже {{ low_confidence_percent }}% программа сравнит два варианта, ниже {{ unknown_percent }}% случай останется нераспознанным.
+          </p>
+        </div>
+      </section>
+    {% endif %}
+
     {% if result %}
-      <section class="result{% if result.unknown %} unknown{% endif %}" aria-live="polite">
+      <section class="panel result{% if result.unknown %} unknown{% elif result.is_healthy %} healthy{% else %} disease{% endif %}" aria-live="polite">
         {% if result.unknown %}
+          <p class="status-kicker">Ответ модели</p>
           <h2>Случай не распознан</h2>
           <p class="verdict">
             <span class="verdict-name">Неизвестное состояние</span>
@@ -53,14 +147,16 @@
             Снимите лист крупнее или покажите растение агроному.
           </p>
         {% else %}
+          <p class="status-kicker">{% if result.is_healthy %}Признаков болезни нет{% else %}Нужна проверка агронома{% endif %}</p>
           <h2>Результат распознавания</h2>
           <p class="verdict">
             <span class="verdict-name">{{ result.class_ru }}</span>
             <code>{{ result.class_name }}</code>
           </p>
-          <p class="confidence">
-            Уверенность модели: <strong>{{ '%.0f'|format(result.confidence * 100) }}%</strong>
-          </p>
+          <p class="confidence">Уверенность модели: <strong>{{ '%.0f'|format(result.confidence * 100) }}%</strong></p>
+          <div class="meter" aria-hidden="true">
+            <span style="width: {{ '%.1f'|format(result.confidence * 100) }}%"></span>
+          </div>
           {% if result.low_confidence %}
             <p class="message notice" role="status">
               Модель не уверена в ответе. Второй вариант —
@@ -72,7 +168,7 @@
 
         <ul class="probabilities">
           {% for item in result.ranked %}
-            <li>
+            <li{% if loop.first %} class="lead-row"{% endif %}>
               <span class="label">{{ item.class_ru }}</span>
               <span class="bar" aria-hidden="true"><span style="width: {{ '%.1f'|format(item.probability * 100) }}%"></span></span>
               <span class="value">{{ '%.1f'|format(item.probability * 100) }}%</span>
@@ -108,60 +204,50 @@
           ошибается примерно в трёх случаях из десяти.
         </p>
       </section>
+    {% else %}
+      <aside class="panel waiting">
+        <p class="eyebrow">Как читать ответ</p>
+        <h2>Сначала снимок, потом состояние</h2>
+        <ol>
+          <li>Выберите культуру — набор болезней у каждой свой.</li>
+          <li>Загрузите лист крупным планом.</li>
+          <li>Сверьте признаки на экране с тем, что видно на фото.</li>
+        </ol>
+        <p class="hint">Ниже {{ low_confidence_percent }}% программа сравнит два варианта. Ниже {{ unknown_percent }}% случай останется нераспознанным, без названия болезни.</p>
+      </aside>
     {% endif %}
+  </div>
 
-    <section class="preview">
-      <h2>Выбранное изображение</h2>
-      <img src="/image?v={{ image.token }}" alt="Загруженная фотография растения">
-      <dl class="facts">
-        <dt>Файл</dt><dd>{{ image.original_name }}</dd>
-        <dt>Формат</dt><dd>{{ image.image_format }}</dd>
-        <dt>Размер кадра</dt><dd>{{ image.width }} × {{ image.height }} px ({{ '%.1f'|format(image.megapixels) }} Мп)</dd>
-        <dt>Объём файла</dt><dd>{{ human_size(image.size_bytes) }}</dd>
-      </dl>
-
-      <div class="actions">
-        <form action="/predict" method="post">
-          <input type="hidden" name="crop" value="{{ crop }}">
-          <button type="submit" class="primary" data-busy="Определяю…">{% if result %}Определить ещё раз{% else %}Определить заболевание{% endif %}</button>
-        </form>
-        <form action="/reset" method="post">
-          <button type="submit" class="ghost">Убрать изображение</button>
-        </form>
+  {% if image %}
+    <section class="panel upload again">
+      <div>
+        <h2>Проверить другую фотографию</h2>
+        <p class="hint">Новый файл заменит текущий снимок {{ crop_genitive }}.</p>
       </div>
-    </section>
-
-    <section class="upload">
-      <h2>Проверить другую фотографию</h2>
       <form action="/upload" method="post" enctype="multipart/form-data">
         <input type="hidden" name="crop" value="{{ crop }}">
-        <input type="file" name="photo" accept="image/*" required>
+        <label class="file-pick">
+          <input type="file" name="photo" accept="image/*" required>
+          <span>Выбрать файл</span>
+        </label>
+        <span class="file-chosen" data-empty="Файл не выбран">Файл не выбран</span>
         <button type="submit" class="primary" name="then" value="predict" data-busy="Определяю…">Заменить и определить</button>
         <button type="submit" class="ghost" data-busy="Загружаю…">Только заменить</button>
       </form>
     </section>
-  {% else %}
-    <section class="upload empty">
-      <h2>Выберите изображение</h2>
-      <form action="/upload" method="post" enctype="multipart/form-data">
-        <input type="hidden" name="crop" value="{{ crop }}">
-        <input type="file" name="photo" accept="image/*" required>
-        <button type="submit" class="primary" name="then" value="predict" data-busy="Определяю…">Определить заболевание</button>
-        <button type="submit" class="ghost" data-busy="Загружаю…">Только загрузить</button>
-      </form>
-      <p class="hint">
-        Форматы: {{ allowed_formats|join(', ') }}. Размер файла — до {{ max_upload_mb }} МБ.
-        Снимок нужен резкий, не слишком тёмный и не пересвеченный. Меньшая сторона — не меньше 64 px.
-        Ниже {{ low_confidence_percent }}% программа сравнит два варианта, ниже {{ unknown_percent }}% случай останется нераспознанным.
-      </p>
-    </section>
   {% endif %}
 
   <section class="classes">
-    <h2>Распознаваемые состояния: {{ crop_title|lower }}</h2>
+    <div class="panel-head">
+      <h2>Распознаваемые состояния: {{ crop_title|lower }}</h2>
+      <p class="hint">Модель различает только эти состояния.</p>
+    </div>
     <ul>
       {% for key, meta in classes.items() %}
-        <li><code>{{ key }}</code> — {{ meta.ru }}</li>
+        <li>
+          <code>{{ key }}</code>
+          <strong>{{ meta.ru }}</strong>
+        </li>
       {% endfor %}
     </ul>
   </section>
@@ -169,6 +255,6 @@
   <footer>
     <p>MVP, версия {{ version }}. Пшеница — Long et al., 2023; ячмень — Martello et al., 2026; кукуруза — Ahmed, 2026. CC-BY-4.0.</p>
   </footer>
-</main>
+</div>
 </body>
 </html>

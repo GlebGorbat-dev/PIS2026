@@ -1,3 +1,11 @@
+document.addEventListener("change", (event) => {
+  const input = event.target;
+  if (!(input instanceof HTMLInputElement) || input.type !== "file") return;
+  const slot = input.form?.querySelector(".file-chosen");
+  if (!slot) return;
+  slot.textContent = input.files?.[0]?.name || slot.dataset.empty || "";
+});
+
 document.addEventListener("submit", (event) => {
   const form = event.target;
   const pressed = event.submitter;
