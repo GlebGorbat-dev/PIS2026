@@ -114,6 +114,10 @@ section.empty {
   border-width: 2px;
 }
 
+.result.unknown {
+  border-color: var(--notice);
+}
+
 .verdict {
   display: flex;
   flex-wrap: wrap;

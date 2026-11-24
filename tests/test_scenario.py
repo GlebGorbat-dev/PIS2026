@@ -110,6 +110,24 @@ def test_unsure_answer_offers_both_variants_to_compare(client, monkeypatch):
     assert main.CLASSES["brown_rust"]["symptoms"][:30] in block
 
 
+def test_unknown_case_does_not_name_a_diagnosis(client, monkeypatch):
+    spread = {"healthy": 0.28, "yellow_rust": 0.22, "brown_rust": 0.20, "septoria": 0.18, "mildew": 0.12}
+    model_returns(monkeypatch, spread)
+    text = choose_and_recognise(client).text
+    assert "Случай не распознан" in text
+    assert "Неизвестное состояние" in text
+    assert "Это не диагноз" in text
+    assert "Модель не уверена" not in text
+    assert 'class="verdict-name"' in text
+    verdict = text[text.index('class="verdict-name"') :][:80]
+    assert "Здоровое растение" not in verdict
+    assert "обработку выбирать нельзя" in text
+    symptoms = text[text.index('class="symptoms"') :]
+    assert "Ближайшие варианты, не ответ" in symptoms
+    assert main.CLASSES["healthy"]["symptoms"][:30] in symptoms
+    assert main.CLASSES["yellow_rust"]["symptoms"][:30] in symptoms
+
+
 def test_healthy_answer_gives_no_treatment_advice(client, monkeypatch):
     model_returns(monkeypatch, HEALTHY)
     text = choose_and_recognise(client).text

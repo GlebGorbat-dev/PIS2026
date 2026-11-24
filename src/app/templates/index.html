@@ -37,22 +37,37 @@
 
   {% if image %}
     {% if result %}
-      <section class="result" aria-live="polite">
-        <h2>Результат распознавания</h2>
-        <p class="verdict">
-          <span class="verdict-name">{{ result.class_ru }}</span>
-          <code>{{ result.class_name }}</code>
-        </p>
-        <p class="confidence">
-          Уверенность модели: <strong>{{ '%.0f'|format(result.confidence * 100) }}%</strong>
-        </p>
-
-        {% if result.low_confidence %}
-          <p class="message notice" role="status">
-            Модель не уверена в ответе. Второй вариант —
-            {{ result.runner_up.class_ru|lower }} ({{ '%.0f'|format(result.runner_up.probability * 100) }}%).
-            Попробуйте снять лист крупнее и при хорошем освещении.
+      <section class="result{% if result.unknown %} unknown{% endif %}" aria-live="polite">
+        {% if result.unknown %}
+          <h2>Случай не распознан</h2>
+          <p class="verdict">
+            <span class="verdict-name">Неизвестное состояние</span>
           </p>
+          <p class="confidence">
+            Лучший вариант набрал <strong>{{ '%.0f'|format(result.confidence * 100) }}%</strong>,
+            порог распознавания — {{ unknown_percent }}%.
+          </p>
+          <p class="message notice" role="status">
+            Это не диагноз. Ближе всего {{ result.class_ru|lower }}
+            и {{ result.runner_up.class_ru|lower }}.
+            Снимите лист крупнее или покажите растение агроному.
+          </p>
+        {% else %}
+          <h2>Результат распознавания</h2>
+          <p class="verdict">
+            <span class="verdict-name">{{ result.class_ru }}</span>
+            <code>{{ result.class_name }}</code>
+          </p>
+          <p class="confidence">
+            Уверенность модели: <strong>{{ '%.0f'|format(result.confidence * 100) }}%</strong>
+          </p>
+          {% if result.low_confidence %}
+            <p class="message notice" role="status">
+              Модель не уверена в ответе. Второй вариант —
+              {{ result.runner_up.class_ru|lower }} ({{ '%.0f'|format(result.runner_up.probability * 100) }}%).
+              Попробуйте снять лист крупнее и при хорошем освещении.
+            </p>
+          {% endif %}
         {% endif %}
 
         <ul class="probabilities">
@@ -66,14 +81,21 @@
         </ul>
 
         <div class="symptoms">
-          <h3>{% if result.low_confidence %}Сравните с фотографией{% else %}Как это выглядит{% endif %}</h3>
+          <h3>
+            {% if result.unknown %}Ближайшие варианты, не ответ
+            {% elif result.low_confidence %}Сравните с фотографией
+            {% else %}Как это выглядит{% endif %}
+          </h3>
           {% for item in result.compare %}
             <p><strong>{{ item.class_ru }}.</strong> {{ item.symptoms }}</p>
           {% endfor %}
         </div>
 
         <p class="advice">
-          {% if result.is_healthy %}
+          {% if result.unknown %}
+            По этому снимку обработку выбирать нельзя: модель не отнесла лист
+            ни к одному известному состоянию.
+          {% elif result.is_healthy %}
             Признаков болезни модель не нашла. Продолжайте регулярно осматривать посевы,
             особенно нижние листья и в сырую погоду.
           {% else %}
@@ -130,6 +152,7 @@
       <p class="hint">
         Форматы: {{ allowed_formats|join(', ') }}. Размер файла — до {{ max_upload_mb }} МБ.
         Снимок нужен резкий, не слишком тёмный и не пересвеченный. Меньшая сторона — не меньше 64 px.
+        Ниже {{ low_confidence_percent }}% программа сравнит два варианта, ниже {{ unknown_percent }}% случай останется нераспознанным.
       </p>
     </section>
   {% endif %}

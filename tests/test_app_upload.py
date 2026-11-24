@@ -138,6 +138,8 @@ def test_index_mentions_photo_quality(client):
     page = client.get("/")
     assert "не слишком тёмный" in page.text
     assert "64 px" in page.text
+    assert "Ниже 60%" in page.text
+    assert "ниже 40%" in page.text
 
 
 def test_dark_image_is_rejected(client):

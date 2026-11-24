@@ -10,6 +10,7 @@ from fastapi.templating import Jinja2Templates
 
 from src import __version__
 from src.app import storage
+from src.app.confidence import confidence_band
 from src.app.settings import (
     ALLOWED_FORMATS,
     COOKIE_MAX_AGE_SECONDS,
@@ -17,6 +18,7 @@ from src.app.settings import (
     DEFAULT_CROP,
     LOW_CONFIDENCE_THRESHOLD,
     MAX_UPLOAD_BYTES,
+    UNKNOWN_THRESHOLD,
     UPLOAD_COOKIE,
 )
 from src.model.predict import Prediction, load_checkpoint
@@ -137,6 +139,8 @@ def render(
             "classes": classes,
             "allowed_formats": sorted(ALLOWED_FORMATS),
             "max_upload_mb": MAX_UPLOAD_BYTES // (1024 * 1024),
+            "low_confidence_percent": int(LOW_CONFIDENCE_THRESHOLD * 100),
+            "unknown_percent": int(UNKNOWN_THRESHOLD * 100),
             "human_size": storage.human_size,
             "version": __version__,
         },
@@ -158,15 +162,17 @@ def describe_prediction(stored: dict, classes: dict) -> dict:
     if not ranked:
         return None
     best = ranked[0]
-    low_confidence = best["probability"] < LOW_CONFIDENCE_THRESHOLD
+    band = confidence_band(best["probability"])
     return {
         "class_name": best["class_name"],
         "class_ru": best["class_ru"],
         "confidence": best["probability"],
-        "is_healthy": best["class_name"] == "healthy",
-        "low_confidence": low_confidence,
+        "band": band,
+        "is_healthy": band == "confident" and best["class_name"] == "healthy",
+        "low_confidence": band == "low",
+        "unknown": band == "unknown",
         "runner_up": ranked[1] if len(ranked) > 1 else None,
-        "compare": ranked[:2] if low_confidence else ranked[:1],
+        "compare": ranked[:1] if band == "confident" else ranked[:2],
         "ranked": ranked,
     }
 
