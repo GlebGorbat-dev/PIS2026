@@ -5,7 +5,7 @@ import io
 import pandas as pd
 import pytest
 from fastapi.testclient import TestClient
-from PIL import Image
+from PIL import Image, ImageDraw
 
 from src.app import main, storage
 from src.app.main import app
@@ -115,9 +115,11 @@ def test_answer_is_read_back_from_the_page(client, monkeypatch, tmp_path):
         lambda path: Prediction("yellow_rust", "Жёлтая ржавчина", 0.40, probabilities),
     )
     image_path = tmp_path / "leaf.png"
-    buffer = io.BytesIO()
-    Image.new("RGB", (640, 480), (90, 130, 70)).save(buffer, format="PNG")
-    image_path.write_bytes(buffer.getvalue())
+    image = Image.new("RGB", (640, 480), (90, 130, 70))
+    draw = ImageDraw.Draw(image)
+    for x in range(0, 640, 8):
+        draw.line((x, 0, x, 480), fill=(40 + (x % 50), 100, 35))
+    image.save(image_path, format="PNG")
 
     answer, error = ask_program(client, image_path, RU_TO_CODE)
     assert error == ""

@@ -3,6 +3,11 @@ from __future__ import annotations
 MAX_UPLOAD_BYTES = 20 * 1024 * 1024
 MAX_IMAGE_PIXELS = 50_000_000
 MIN_SIDE_PX = 64
+# Пороги отсекают заведомо плохой кадр и не задевают 999 полевых снимков пшеницы:
+# у них яркость 50–176, резкость (дисперсия лапласиана на 224 px) от 78.
+MIN_MEAN_LUMINANCE = 40.0
+MAX_MEAN_LUMINANCE = 220.0
+MIN_FOCUS = 40.0
 
 ALLOWED_FORMATS: dict[str, str] = {
     "JPEG": "image/jpeg",

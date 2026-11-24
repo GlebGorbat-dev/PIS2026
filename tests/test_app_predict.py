@@ -4,7 +4,7 @@ import io
 
 import pytest
 from fastapi.testclient import TestClient
-from PIL import Image
+from PIL import Image, ImageDraw
 
 from src.app import main, storage
 from src.app.main import app
@@ -22,8 +22,12 @@ def client(tmp_path, monkeypatch):
 
 
 def make_image(width: int = 640, height: int = 480) -> bytes:
+    image = Image.new("RGB", (width, height), (90, 130, 70))
+    draw = ImageDraw.Draw(image)
+    for x in range(0, width, 8):
+        draw.line((x, 0, x, height), fill=(40 + (x % 50), 100, 35))
     buffer = io.BytesIO()
-    Image.new("RGB", (width, height), (90, 130, 70)).save(buffer, format="PNG")
+    image.save(buffer, format="PNG")
     return buffer.getvalue()
 
 

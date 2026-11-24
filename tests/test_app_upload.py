@@ -4,7 +4,7 @@ import io
 
 import pytest
 from fastapi.testclient import TestClient
-from PIL import Image
+from PIL import Image, ImageDraw, ImageFilter
 
 from src.app import storage
 from src.app.main import app
@@ -18,9 +18,20 @@ def client(tmp_path, monkeypatch):
         yield test_client
 
 
-def make_image(width: int = 640, height: int = 480, image_format: str = "PNG") -> bytes:
+def make_image(
+    width: int = 640,
+    height: int = 480,
+    image_format: str = "PNG",
+    color: tuple[int, int, int] = (90, 130, 70),
+    texture: bool = True,
+) -> bytes:
+    image = Image.new("RGB", (width, height), color)
+    if texture:
+        draw = ImageDraw.Draw(image)
+        for x in range(0, width, 8):
+            draw.line((x, 0, x, height), fill=(40 + (x % 50), 100, 35))
     buffer = io.BytesIO()
-    Image.new("RGB", (width, height), (90, 130, 70)).save(buffer, format=image_format)
+    image.save(buffer, format=image_format)
     return buffer.getvalue()
 
 
@@ -121,6 +132,48 @@ def test_empty_file_is_rejected(client):
     response = client.post("/upload", files={"photo": ("empty.png", b"", "image/png")})
     assert response.status_code == 400
     assert "пустой" in response.text.lower()
+
+
+def test_index_mentions_photo_quality(client):
+    page = client.get("/")
+    assert "не слишком тёмный" in page.text
+    assert "64 px" in page.text
+
+
+def test_dark_image_is_rejected(client):
+    response = client.post(
+        "/upload",
+        files={"photo": ("night.png", make_image(color=(8, 8, 8), texture=False), "image/png")},
+    )
+    assert response.status_code == 400
+    assert "слишком тёмный" in response.text.lower()
+    assert not client.cookies.get(UPLOAD_COOKIE)
+
+
+def test_bright_image_is_rejected(client):
+    response = client.post(
+        "/upload",
+        files={"photo": ("flash.png", make_image(color=(248, 248, 248), texture=False), "image/png")},
+    )
+    assert response.status_code == 400
+    assert "слишком светлый" in response.text.lower()
+
+
+def test_blurred_image_is_rejected(client):
+    sharp = Image.open(io.BytesIO(make_image()))
+    blurred = sharp.filter(ImageFilter.GaussianBlur(12))
+    buffer = io.BytesIO()
+    blurred.save(buffer, format="PNG")
+    response = client.post("/upload", files={"photo": ("soft.png", buffer.getvalue(), "image/png")})
+    assert response.status_code == 400
+    assert "размыт" in response.text.lower()
+
+
+def test_truncated_file_is_rejected(client):
+    raw = make_image()
+    response = client.post("/upload", files={"photo": ("broken.png", raw[:80], "image/png")})
+    assert response.status_code == 400
+    assert "не удалось прочитать" in response.text.lower()
 
 
 def test_too_small_image_is_rejected(client):

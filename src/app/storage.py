@@ -9,6 +9,7 @@ from pathlib import Path
 
 from PIL import Image, UnidentifiedImageError
 
+from src.app.quality import measure, problem
 from src.app.settings import (
     ALLOWED_FORMATS,
     FORMAT_EXTENSIONS,
@@ -62,7 +63,8 @@ def validate(raw: bytes, original_name: str) -> tuple[str, int, int]:
         with Image.open(io.BytesIO(raw)) as image:
             image_format = image.format or ""
             width, height = image.size
-            image.verify()
+            image.load()
+            features = measure(image)
     except Image.DecompressionBombError:
         raise UploadError(
             "Изображение слишком большое по числу пикселей и может исчерпать память."
@@ -70,6 +72,7 @@ def validate(raw: bytes, original_name: str) -> tuple[str, int, int]:
     except (UnidentifiedImageError, OSError, ValueError):
         raise UploadError(
             f"Не удалось прочитать «{original_name}» как изображение. "
+            "Файл повреждён или это не фотография. "
             f"Допустимые форматы: {', '.join(sorted(ALLOWED_FORMATS))}."
         ) from None
 
@@ -90,6 +93,10 @@ def validate(raw: bytes, original_name: str) -> tuple[str, int, int]:
             f"Изображение {width}x{height} слишком мелкое: "
             f"меньшая сторона должна быть не менее {MIN_SIDE_PX} пикселей."
         )
+
+    message = problem(features)
+    if message:
+        raise UploadError(message)
 
     return image_format, width, height
 
