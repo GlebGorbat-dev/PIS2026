@@ -21,6 +21,9 @@ data/interim/images/
 data/processed/images/
 data/uploads/
 data/history/
+data/independent/**/*.jpeg
+data/independent/**/*.jpg
+data/independent/**/*.png
 
 models/*.pt
 models/*.pth
