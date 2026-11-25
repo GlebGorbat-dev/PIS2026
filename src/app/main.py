@@ -21,6 +21,7 @@ from src.app.settings import (
     UNKNOWN_THRESHOLD,
     UPLOAD_COOKIE,
 )
+from src.model.crop_gate import check_crop, load as load_crop_gate
 from src.model.predict import Prediction, load_checkpoint
 from src.model.predict import predict as run_model
 from src.paths import (
@@ -45,6 +46,10 @@ MODEL_STATE: dict[str, object] = {"loaded": False, "crops": {}}
 
 
 def warm_up_model() -> None:
+    try:
+        load_crop_gate()
+    except FileNotFoundError:
+        pass
     loaded: dict[str, bool] = {}
     for crop, path in CROP_CHECKPOINTS.items():
         try:
@@ -178,6 +183,13 @@ def describe_prediction(stored: dict, classes: dict) -> dict:
 
 
 def recognise(token: str, image: storage.StoredImage, crop: str) -> tuple[str, int] | None:
+    try:
+        mismatch = check_crop(image.path, crop)
+    except FileNotFoundError:
+        return "Проверка культуры недоступна: не найден файл весов. Обратитесь к администратору.", 503
+    if mismatch:
+        storage.clear_prediction(token)
+        return mismatch, 422
     weights = CROP_CHECKPOINTS[crop]
     kwargs = {} if crop == DEFAULT_CROP else {"weights_path": weights}
     try:

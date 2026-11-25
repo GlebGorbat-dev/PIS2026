@@ -28,6 +28,7 @@ models/*.onnx
 !models/stage10.pt
 !models/barley.pt
 !models/maize.pt
+!models/crop_gate.pt
 runs/
 logs/
 *.log

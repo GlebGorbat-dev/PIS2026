@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import io
+from pathlib import Path
 
 import pytest
 from fastapi.testclient import TestClient
@@ -88,6 +89,48 @@ def test_low_confidence_warns_and_names_runner_up(client, monkeypatch):
     text = client.post("/predict").text
     assert "Модель не уверена" in text
     assert "бурая ржавчина (38%)" in text
+
+
+def test_banana_photo_is_rejected_on_the_page(client):
+    path = Path("tests/fixtures/banana.jpg")
+    if not path.exists():
+        pytest.skip("нет tests/fixtures/banana.jpg")
+    raw = path.read_bytes()
+    response = client.post(
+        "/upload",
+        data={"then": "predict", "crop": "wheat"},
+        files={"photo": ("Bananas.jpg", raw, "image/jpeg")},
+    )
+    assert response.status_code == 422
+    assert (
+        "На снимке не пшеница. Это не лист пшеницы, "
+        "поэтому болезнь не определяется. Загрузите фотографию выбранной культуры."
+    ) in response.text
+    assert "Результат распознавания" not in response.text
+    assert "Уверенность модели" not in response.text
+    assert "Bananas.jpg" in response.text
+
+
+def test_foreign_subject_is_rejected_before_the_disease_model(client, monkeypatch):
+    def forbidden(path, **kwargs):
+        raise AssertionError("модель болезни не должна вызываться")
+
+    monkeypatch.setattr(
+        main,
+        "check_crop",
+        lambda path, crop: (
+            "На снимке не пшеница. Это не лист пшеницы, "
+            "поэтому болезнь не определяется. Загрузите фотографию выбранной культуры."
+        ),
+    )
+    monkeypatch.setattr(main, "run_model", forbidden)
+    upload(client)
+
+    response = client.post("/predict")
+    assert response.status_code == 422
+    assert "Это не лист пшеницы, поэтому болезнь не определяется" in response.text
+    assert "Результат распознавания" not in response.text
+    assert "Выбранное изображение" in response.text
 
 
 def test_predict_without_image_asks_to_choose_one(client):
