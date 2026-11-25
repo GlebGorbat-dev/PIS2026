@@ -7,7 +7,7 @@ import pytest
 from fastapi.testclient import TestClient
 from PIL import Image, ImageDraw
 
-from src.app import main, storage
+from src.app import history, main, storage
 from src.app.main import app
 from src.control.build import build_control_sets
 from src.control.run import ask_program, check_class, parse_answer, wilson_interval
@@ -103,6 +103,7 @@ def test_unanswered_images_fail_the_class():
 @pytest.fixture
 def client(tmp_path, monkeypatch):
     monkeypatch.setattr(storage, "UPLOADS_DIR", tmp_path)
+    monkeypatch.setattr(history, "HISTORY_DIR", tmp_path / "history")
     with TestClient(app) as test_client:
         yield test_client
 

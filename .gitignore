@@ -20,6 +20,7 @@ data/raw/
 data/interim/images/
 data/processed/images/
 data/uploads/
+data/history/
 
 models/*.pt
 models/*.pth
@@ -28,6 +29,7 @@ models/*.onnx
 !models/stage10.pt
 !models/barley.pt
 !models/maize.pt
+!models/crop_gate.pt
 runs/
 logs/
 *.log

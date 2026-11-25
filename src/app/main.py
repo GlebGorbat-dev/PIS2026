@@ -9,7 +9,7 @@ from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 
 from src import __version__
-from src.app import storage
+from src.app import history, storage
 from src.app.confidence import confidence_band
 from src.app.settings import (
     ALLOWED_FORMATS,
@@ -21,6 +21,7 @@ from src.app.settings import (
     UNKNOWN_THRESHOLD,
     UPLOAD_COOKIE,
 )
+from src.model.crop_gate import check_crop, load as load_crop_gate
 from src.model.predict import Prediction, load_checkpoint
 from src.model.predict import predict as run_model
 from src.paths import (
@@ -45,6 +46,10 @@ MODEL_STATE: dict[str, object] = {"loaded": False, "crops": {}}
 
 
 def warm_up_model() -> None:
+    try:
+        load_crop_gate()
+    except FileNotFoundError:
+        pass
     loaded: dict[str, bool] = {}
     for crop, path in CROP_CHECKPOINTS.items():
         try:
@@ -142,6 +147,7 @@ def render(
             "low_confidence_percent": int(LOW_CONFIDENCE_THRESHOLD * 100),
             "unknown_percent": int(UNKNOWN_THRESHOLD * 100),
             "human_size": storage.human_size,
+            "history": history.list_entries()[:30],
             "version": __version__,
         },
         status_code=status_code,
@@ -178,6 +184,13 @@ def describe_prediction(stored: dict, classes: dict) -> dict:
 
 
 def recognise(token: str, image: storage.StoredImage, crop: str) -> tuple[str, int] | None:
+    try:
+        mismatch = check_crop(image.path, crop)
+    except FileNotFoundError:
+        return "Проверка культуры недоступна: не найден файл весов. Обратитесь к администратору.", 503
+    if mismatch:
+        storage.clear_prediction(token)
+        return mismatch, 422
     weights = CROP_CHECKPOINTS[crop]
     kwargs = {} if crop == DEFAULT_CROP else {"weights_path": weights}
     try:
@@ -205,6 +218,16 @@ def recognise(token: str, image: storage.StoredImage, crop: str) -> tuple[str, i
             "probabilities": prediction.probabilities,
         },
     )
+    try:
+        history.record(
+            image,
+            crop=crop,
+            class_name=prediction.class_name,
+            class_ru=prediction.class_ru,
+            confidence=prediction.confidence,
+        )
+    except OSError:
+        pass
     return None
 
 
@@ -284,6 +307,14 @@ def current_image(request: Request) -> Response:
         media_type=image.media_type,
         headers={"Cache-Control": "no-store"},
     )
+
+
+@app.get("/history/{entry_id}/photo")
+def history_photo(entry_id: str) -> Response:
+    photo = history.photo(entry_id)
+    if photo is None:
+        return Response(status_code=404)
+    return FileResponse(photo.path, media_type=photo.media_type, headers={"Cache-Control": "no-store"})
 
 
 @app.post("/predict")

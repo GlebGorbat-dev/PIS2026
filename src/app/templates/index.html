@@ -124,6 +124,7 @@
             Форматы: {{ allowed_formats|join(', ') }}. Размер файла — до {{ max_upload_mb }} МБ.
             Снимок нужен резкий, не слишком тёмный и не пересвеченный. Меньшая сторона — не меньше 64 px.
             Ниже {{ low_confidence_percent }}% программа сравнит два варианта, ниже {{ unknown_percent }}% случай останется нераспознанным.
+            Если на фотографии не {{ crop_title|lower }}, болезнь не определяется.
           </p>
         </div>
       </section>
@@ -213,7 +214,7 @@
           <li>Загрузите лист крупным планом.</li>
           <li>Сверьте признаки на экране с тем, что видно на фото.</li>
         </ol>
-        <p class="hint">Ниже {{ low_confidence_percent }}% программа сравнит два варианта. Ниже {{ unknown_percent }}% случай останется нераспознанным, без названия болезни.</p>
+        <p class="hint">Ниже {{ low_confidence_percent }}% программа сравнит два варианта. Ниже {{ unknown_percent }}% случай останется нераспознанным, без названия болезни. Чужое растение или предмет не получают диагноз выбранной культуры.</p>
       </aside>
     {% endif %}
   </div>
@@ -250,6 +251,38 @@
         </li>
       {% endfor %}
     </ul>
+  </section>
+
+  <section class="panel history" id="history">
+    <div class="panel-head">
+      <h2>История анализов</h2>
+      <p class="hint">Сохраняются снимок, дата, класс, уверенность и надёжность ответа.</p>
+    </div>
+    {% if history %}
+      <ul class="history-list">
+        {% for entry in history %}
+          <li class="history-card">
+            <a href="/history/{{ entry.id }}/photo">
+              <img src="/history/{{ entry.id }}/photo" alt="Снимок анализа от {{ entry.created_label }}">
+            </a>
+            <div>
+              <p class="history-date">{{ entry.created_label }} · {{ entry.crop_ru }}</p>
+              <p class="history-class">{{ entry.class_ru }} <code>{{ entry.class_name }}</code></p>
+              <p class="history-meta">
+                Уверенность {{ '%.0f'|format(entry.confidence * 100) }}%.
+                {% if entry.reliable %}
+                  <span class="badge ok">Надёжно</span>
+                {% else %}
+                  <span class="badge no">Ненадёжно</span>
+                {% endif %}
+              </p>
+            </div>
+          </li>
+        {% endfor %}
+      </ul>
+    {% else %}
+      <p class="hint">Сохранённых анализов пока нет.</p>
+    {% endif %}
   </section>
 
   <footer>
