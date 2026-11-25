@@ -9,7 +9,7 @@ from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 
 from src import __version__
-from src.app import storage
+from src.app import history, storage
 from src.app.confidence import confidence_band
 from src.app.settings import (
     ALLOWED_FORMATS,
@@ -147,6 +147,7 @@ def render(
             "low_confidence_percent": int(LOW_CONFIDENCE_THRESHOLD * 100),
             "unknown_percent": int(UNKNOWN_THRESHOLD * 100),
             "human_size": storage.human_size,
+            "history": history.list_entries()[:30],
             "version": __version__,
         },
         status_code=status_code,
@@ -217,6 +218,16 @@ def recognise(token: str, image: storage.StoredImage, crop: str) -> tuple[str, i
             "probabilities": prediction.probabilities,
         },
     )
+    try:
+        history.record(
+            image,
+            crop=crop,
+            class_name=prediction.class_name,
+            class_ru=prediction.class_ru,
+            confidence=prediction.confidence,
+        )
+    except OSError:
+        pass
     return None
 
 
@@ -296,6 +307,14 @@ def current_image(request: Request) -> Response:
         media_type=image.media_type,
         headers={"Cache-Control": "no-store"},
     )
+
+
+@app.get("/history/{entry_id}/photo")
+def history_photo(entry_id: str) -> Response:
+    photo = history.photo(entry_id)
+    if photo is None:
+        return Response(status_code=404)
+    return FileResponse(photo.path, media_type=photo.media_type, headers={"Cache-Control": "no-store"})
 
 
 @app.post("/predict")

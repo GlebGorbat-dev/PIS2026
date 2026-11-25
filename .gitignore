@@ -20,6 +20,7 @@ data/raw/
 data/interim/images/
 data/processed/images/
 data/uploads/
+data/history/
 
 models/*.pt
 models/*.pth

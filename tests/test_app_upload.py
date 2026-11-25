@@ -6,7 +6,7 @@ import pytest
 from fastapi.testclient import TestClient
 from PIL import Image, ImageDraw, ImageFilter
 
-from src.app import storage
+from src.app import history, storage
 from src.app.main import app
 from src.app.settings import MAX_UPLOAD_BYTES, UPLOAD_COOKIE
 
@@ -14,6 +14,7 @@ from src.app.settings import MAX_UPLOAD_BYTES, UPLOAD_COOKIE
 @pytest.fixture
 def client(tmp_path, monkeypatch):
     monkeypatch.setattr(storage, "UPLOADS_DIR", tmp_path)
+    monkeypatch.setattr(history, "HISTORY_DIR", tmp_path / "history")
     with TestClient(app) as test_client:
         yield test_client
 

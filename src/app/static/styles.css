@@ -651,3 +651,78 @@ footer p {
     transition: none !important;
   }
 }
+
+.history {
+  margin-top: 22px;
+}
+
+.history-list {
+  display: grid;
+  gap: 12px;
+  margin: 16px 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.history-card {
+  display: grid;
+  grid-template-columns: 92px minmax(0, 1fr);
+  gap: 14px;
+  align-items: center;
+  padding-top: 12px;
+  border-top: 1px solid var(--line);
+}
+
+.history-list li:first-child {
+  padding-top: 4px;
+  border-top: 0;
+}
+
+.history-card img {
+  display: block;
+  width: 92px;
+  height: 72px;
+  object-fit: cover;
+  border-radius: 12px;
+  background: var(--leaf);
+}
+
+.history-date,
+.history-class,
+.history-meta {
+  margin: 0;
+}
+
+.history-date {
+  color: var(--muted);
+  font-size: 13px;
+}
+
+.history-class {
+  font-family: var(--serif);
+  font-size: 22px;
+  line-height: 1.2;
+}
+
+.history-meta {
+  color: var(--muted);
+}
+
+.badge {
+  display: inline-block;
+  margin-left: 6px;
+  padding: 1px 8px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.badge.ok {
+  color: var(--green-deep);
+  background: var(--leaf);
+}
+
+.badge.no {
+  color: var(--notice);
+  background: var(--notice-bg);
+}

@@ -7,7 +7,7 @@ import pytest
 from fastapi.testclient import TestClient
 from PIL import Image, ImageDraw
 
-from src.app import main, storage
+from src.app import history, main, storage
 from src.app.main import app
 from src.model.predict import Prediction
 from src.paths import RAW_IMAGES_DIR, STAGE4_CHECKPOINT
@@ -18,6 +18,7 @@ NAMES = ["healthy", "yellow_rust", "brown_rust", "septoria", "mildew"]
 @pytest.fixture
 def client(tmp_path, monkeypatch):
     monkeypatch.setattr(storage, "UPLOADS_DIR", tmp_path)
+    monkeypatch.setattr(history, "HISTORY_DIR", tmp_path / "history")
     with TestClient(app) as test_client:
         yield test_client
 
@@ -109,6 +110,7 @@ def test_banana_photo_is_rejected_on_the_page(client):
     assert "Результат распознавания" not in response.text
     assert "Уверенность модели" not in response.text
     assert "Bananas.jpg" in response.text
+    assert history.list_entries() == []
 
 
 def test_foreign_subject_is_rejected_before_the_disease_model(client, monkeypatch):
@@ -131,6 +133,45 @@ def test_foreign_subject_is_rejected_before_the_disease_model(client, monkeypatc
     assert "Это не лист пшеницы, поэтому болезнь не определяется" in response.text
     assert "Результат распознавания" not in response.text
     assert "Выбранное изображение" in response.text
+
+
+def test_analyses_remain_after_the_upload_is_removed(client, monkeypatch):
+    monkeypatch.setattr(
+        main,
+        "run_model",
+        lambda path, **kwargs: fake_prediction(
+            {"healthy": 0.02, "yellow_rust": 0.87, "brown_rust": 0.05, "septoria": 0.04, "mildew": 0.02}
+        ),
+    )
+    upload(client)
+    first = client.post("/predict")
+    assert "Надёжно" in first.text
+
+    monkeypatch.setattr(
+        main,
+        "run_model",
+        lambda path, **kwargs: fake_prediction(
+            {"healthy": 0.10, "yellow_rust": 0.05, "brown_rust": 0.15, "septoria": 0.50, "mildew": 0.20}
+        ),
+    )
+    upload(client)
+    second = client.post("/predict")
+    assert "Септориоз" in second.text
+    assert "Ненадёжно" in second.text
+    assert "Жёлтая ржавчина" in second.text
+
+    page = client.post("/reset")
+    assert "Выбранное изображение" not in page.text
+    assert "Жёлтая ржавчина" in page.text
+    assert "Септориоз" in page.text
+    entries = history.list_entries()
+    assert len(entries) == 2
+    assert entries[0]["reliable"] is False
+    assert entries[1]["reliable"] is True
+    for entry in entries:
+        photo = client.get(f"/history/{entry['id']}/photo")
+        assert photo.status_code == 200
+        assert photo.headers["content-type"].startswith("image/")
 
 
 def test_predict_without_image_asks_to_choose_one(client):

@@ -25,6 +25,7 @@ SPLITS_DIR = PROCESSED_DIR / "splits"
 CONTROL_DIR = DATA_DIR / "control"
 
 UPLOADS_DIR = DATA_DIR / "uploads"
+HISTORY_DIR = DATA_DIR / "history"
 
 MODELS_DIR = PROJECT_ROOT / "models"
 STAGE4_CHECKPOINT = MODELS_DIR / "stage4.pt"

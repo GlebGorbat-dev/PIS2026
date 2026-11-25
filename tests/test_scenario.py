@@ -6,7 +6,7 @@ import pytest
 from fastapi.testclient import TestClient
 from PIL import Image, ImageDraw
 
-from src.app import main, storage
+from src.app import history, main, storage
 from src.app.main import app
 from src.app.settings import UPLOAD_COOKIE
 from src.model.predict import Prediction
@@ -20,6 +20,7 @@ HEALTHY = {"healthy": 0.95, "yellow_rust": 0.01, "brown_rust": 0.01, "septoria":
 @pytest.fixture
 def client(tmp_path, monkeypatch):
     monkeypatch.setattr(storage, "UPLOADS_DIR", tmp_path)
+    monkeypatch.setattr(history, "HISTORY_DIR", tmp_path / "history")
     with TestClient(app) as test_client:
         yield test_client
 
